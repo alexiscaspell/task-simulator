@@ -3,12 +3,13 @@ import json
 from datetime import datetime,timedelta
 from enum import Enum
 import builtins
+from typing import List
 
-configuracion = None
+config = None
 FORMATO_SALIDA_FECHA="%d/%m/%yT%H:%M:%SZ"
 
 def print(algo,logging=None):
-  if logging or configuracion and configuracion.logging:
+  if logging or configuracion and config.logging:
     return builtins.print(algo)
 
 class UnidadTiempo(Enum):
@@ -38,7 +39,7 @@ class UnidadTiempo(Enum):
         return un_tiempo
 
 class Configuracion():
-    def __init__(self, configuracion_spec:dict):
+    def __init__(self, configuracion_spec):
         self.logging = configuracion_spec.get("logging",False)
         self.cantidad_juniors = configuracion_spec['cantidad_juniors']
         self.cantidad_semiseniors = configuracion_spec['cantidad_semiseniors']
@@ -47,10 +48,10 @@ class Configuracion():
         self.fecha_inicial = datetime.strptime(configuracion_spec.get('fecha_inicial',datetime.strftime(datetime.now(),self.formato_fecha)),self.formato_fecha)
         self.unidad_tiempo = UnidadTiempo(configuracion_spec.get('unidad_tiempo',"segundos"))
         self.tiempo_fin_simulacion = self.unidad_tiempo.llevar_a_segundos(configuracion_spec['tiempo_fin_simulacion'])
-        self.fecha_fin= self.calcular_fecha_fin(self.fecha_inicial,configuracion_spec['tiempo_fin_simulacion'],self.unidad_tiempo)
+        self.fecha_fin= self.calcular_fecha_fin()
 
     def calcular_fecha_fin(self)->datetime:
-        return self.calcular_fecha(self.fecha_inicial,self.tiempo_fin,UnidadTiempo.Segundos)
+        return self.calcular_fecha(self.fecha_inicial,self.tiempo_fin_simulacion,UnidadTiempo.Segundos)
 
     def calcular_fecha(self,fecha_inicial:datetime,tiempo_fin:int,unidad_tiempo:UnidadTiempo=UnidadTiempo.Segundos)->datetime:
         tiempo_fin_minutos = unidad_tiempo.llevar_a_minutos(tiempo_fin)
@@ -86,7 +87,7 @@ def obtener_configuracion_de_archivo(path)->Configuracion:
         json_data = json.loads(text)
     return Configuracion(json_data)
 
-configuracion = obtener_configuracion_de_archivo("./configuracion.json")
+config = obtener_configuracion_de_archivo("./configuracion.json")
 
 def configuracion():
-    return configuracion
+    return config
