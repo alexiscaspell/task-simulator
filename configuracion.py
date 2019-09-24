@@ -81,7 +81,7 @@ class Configuracion():
             "horas_laborales_dia", 8)
         self.probabilidades_tareas = configuracion_spec["probabilidades_tareas"]
         self.fecha_fin = self.calcular_fecha_fin()
-        self.metricas_spec = configuracion_spec.get("metricas",{})
+        self.metricas_spec = configuracion_spec.get("metricas",[])
 
     def calcular_fecha_fin(self) -> datetime:
         return self.calcular_fecha(self.fecha_inicial, self.tiempo_fin_simulacion, UnidadTiempo.Segundos)

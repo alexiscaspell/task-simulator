@@ -1,6 +1,6 @@
 from typing import List
 from simulacion import Simulacion,Metrica,crear_eventos_llegada,Evento
-from tareas import Tarea,tareas_random
+from tareas import Tarea,tareas_random,string_a_fecha
 import bisect
 import configuracion
 from configuracion import Configuracion,print
@@ -12,7 +12,10 @@ def cargar_tareas(path:str)->List[Tarea]:
         return None
     with open(path) as file:
         tareas_specs =json.load(file)
-        return [Tarea(t) for t in tareas_specs]
+        f = lambda t: string_a_fecha(t["fecha_creacion"])
+        tareas_specs.sort(key=f)
+
+    return [Tarea(t) for t in tareas_specs]
 
 def realizar_simulacion(tareas_file_path:str=None)->List[Metrica]:
     lista_tareas = cargar_tareas(tareas_file_path)
@@ -27,14 +30,15 @@ def realizar_simulacion(tareas_file_path:str=None)->List[Metrica]:
     return simular(data)
 
 def insertar_eventos(eventos:List[Evento],mas_eventos:List[Evento]):
+
     for e in mas_eventos:
         tiempos_eventos = list(map(lambda ev: ev.tiempo, eventos))
 
-        desplazamiento = bisect.bisect_right(
-            tiempos_eventos, e.tiempo)
+        desplazamiento = bisect.bisect_right(tiempos_eventos, e.tiempo)
         resto = len(eventos) - desplazamiento
 
-        eventos[desplazamiento:resto] = [e]
+        eventos = eventos[desplazamiento:]+[e]+eventos[:resto]
+
     return eventos
         
 
@@ -47,21 +51,26 @@ def simular(simulacion:Simulacion)->List[Metrica]:
     procesados=0
     total=len(eventos)
 
-    while(len(eventos)>0):
+    while(simulacion.tiempo_sistema<simulacion.tiempo_fin):
 
         procesados +=1
 
-        evento = eventos.pop()
+        evento = eventos.pop(0) if len(eventos)>0 else None
+
+        if evento is None:
+            continue
 
         simulacion.tiempo_sistema = evento.tiempo
 
         nuevos_eventos = simulacion.resolver(evento)
 
-        procesados-=len(nuevos_eventos)
+        total+=len(nuevos_eventos)-1
 
         eventos = insertar_eventos(eventos,nuevos_eventos)
 
-        print(f"PROCESADOS {procesados} DE {total} EVENTOS")
+        print(f"PROCESADOS {procesados}/{total} EVENTOS")
+
+    print(f"TIEMPO FINAL: {simulacion.tiempo_sistema}")
 
     
     return simulacion.resultado_metricas()

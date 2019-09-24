@@ -2,13 +2,20 @@
     "cantidad_juniors": 1,
     "cantidad_semiseniors": 1,
     "cantidad_seniors": 1,
-    "tiempo_fin_simulacion": 2880,
-    "unidad_tiempo": "horas",
-    "fecha_inicial": "01/05/19T09:00:00Z",
+    "tiempo_fin_simulacion": 172800,
+    "logging":true,
+    "unidad_tiempo": "minutos",
+    "fecha_inicial": "01/01/18T09:00:00Z",
     "formato_fecha": "%d/%m/%yT%H:%M:%SZ",
-    "tiempo_de_resolucion":{"funcion":"tiempo_resolucion_hard","modulo":"lobo_fdp"},
-    "intervalo_arribo_tareas": {"funcion":"intervalo_arribo_hard","modulo":"lobo_fdp"},
-    "archivo_datos":"./datos/tareas.json",
+    "tiempo_de_resolucion": {
+        "funcion": "tiempo_resolucion_hard",
+        "modulo": "lobo_fdp"
+    },
+    "intervalo_arribo_tareas": {
+        "funcion": "intervalo_arribo_hard",
+        "modulo": "lobo_fdp"
+    },
+    "archivo_datos": "./datos/tareas.json",
     "probabilidades_tareas": {
         "imposible": 0.25,
         "normal": 0.37,

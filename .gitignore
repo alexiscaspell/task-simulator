@@ -110,3 +110,7 @@ venv.bak/
 venv3.7.3/Include/
 
 venv3.7.3/
+
+venv3\.7/bin/
+
+venv3\.7/include/

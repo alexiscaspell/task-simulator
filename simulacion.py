@@ -50,7 +50,7 @@ def crear_eventos_llegada(tareas:List[Tarea])->List[EventoLlegada]:
     
 def crear_eventos_salida(tareas:List[Tarea])->List[EventoSalida]:
     try:
-        return list(map(lambda t: EventoLlegada(t),tareas))
+        return list(map(lambda t: EventoSalida(t),tareas))
     except Exception:
         print(f"TAREAS A SALIR: {tareas}")
 
@@ -63,6 +63,7 @@ class Simulacion:
         self.metricas = list(
             map(lambda m: FactoryMetricas.crear(m), metricas_spec))
         self.tiempo_sistema = 0
+        self.tiempo_fin = configuracion.tiempo_fin_simulacion
         self.administradores = administradores
 
     def _asignar(self, lista_tareas: List[Tarea]) -> Tuple[List,List]:
@@ -71,14 +72,19 @@ class Simulacion:
         tareas_asignadas = []
 
         while len(lista_tareas) > 0:
-            tarea = lista_tareas.pop()
+            tarea = lista_tareas.pop(0)
+
+            se_puede_resolver = False
 
             for admin in self.administradores:
                 if admin.alguien_puede_resolver(tarea):
                     tarea_actualizada = admin.resolver_tarea(self.tiempo_sistema,tarea)
                     tareas_asignadas.append(tarea_actualizada)
-                else:
-                    tareas_sin_asignar.append(tarea)
+                    se_puede_resolver=True
+                    break
+            if not se_puede_resolver:    
+                tareas_sin_asignar.append(tarea)
+
 
         return tareas_asignadas,tareas_sin_asignar
 
