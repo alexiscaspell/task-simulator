@@ -5,6 +5,7 @@ import bisect
 import configuracion
 from configuracion import Configuracion,print
 import json
+from math import ceil
 from administradores import Administrador,crear_administrador,PefilProgramador
 
 def cargar_tareas(path:str)->List[Tarea]:
@@ -65,13 +66,13 @@ def simular(simulacion:Simulacion)->List[Metrica]:
 
         nuevos_eventos = simulacion.resolver(evento)
 
-        total+=len(nuevos_eventos)-1
-
         eventos = insertar_eventos(eventos,nuevos_eventos)
 
-        print(f"PROCESADOS {procesados}/{total} EVENTOS")
+        if procesados%ceil(0.1*total)==0:
+            print(f"PROCESADOS {procesados} EVENTOS")
 
     print(f"TIEMPO FINAL: {simulacion.tiempo_sistema}")
+    print(f"PROCESADOS {procesados} EVENTOS")
 
     
     return simulacion.resultado_metricas()

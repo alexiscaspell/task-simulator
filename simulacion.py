@@ -49,10 +49,7 @@ def crear_eventos_llegada(tareas:List[Tarea])->List[EventoLlegada]:
     return list(map(lambda t: EventoLlegada(t),tareas))
     
 def crear_eventos_salida(tareas:List[Tarea])->List[EventoSalida]:
-    try:
-        return list(map(lambda t: EventoSalida(t),tareas))
-    except Exception:
-        print(f"TAREAS A SALIR: {tareas}")
+    return list(map(lambda t: EventoSalida(t),tareas))
 
 class Simulacion:
     def __init__(self, configuracion, lista_tareas, administradores):
@@ -97,12 +94,14 @@ class Simulacion:
             a.actualizar_tiempo_ocioso(self.tiempo_sistema)
 
         if(isinstance(evento,EventoLlegada)):
+            print(f"LLEGADA DE {evento.tarea.tipo_tarea.value} ...")
             asignadas,sin_asignar = self._asignar([evento.tarea])
             llegadas = crear_eventos_llegada(sin_asignar)
             salidas = crear_eventos_salida(asignadas)
             self.tareas_finalizadas = self.tareas_finalizadas + asignadas
 
         elif isinstance(evento,EventoSalida):
+            print(f"SALIDA DE {evento.tarea.perfil.value} ...")
             admin = next(a for a in self.administradores if a.perfil==evento.tarea.perfil)
             admin.finalizar_tarea(evento.tarea)
 

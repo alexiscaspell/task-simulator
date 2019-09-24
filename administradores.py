@@ -29,6 +29,7 @@ class Administrador:
 
     def resolver_tarea(self, tiempo_actual, tarea)->Tarea:
         self.programadores_ocupados += 1
+        tarea.perfil=self.perfil
         tarea.tiempo_finalizacion = tiempo_actual + \
             self.tiempo_resolucion_tarea(tarea)
         return tarea

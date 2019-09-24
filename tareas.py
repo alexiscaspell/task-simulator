@@ -130,6 +130,9 @@ def tareas_random(tiempo_fin_simulacion: int) -> List[Tarea]:
 
         t=nueva_tarea.tiempo_creacion
 
+        if len(lista_tareas)%100==0:
+            print(f"GENERADAS {len(lista_tareas)} TAREAS")
+
         # lista_tareas = lista_tareas[desplazamiento:] + [nueva_tarea] + lista_tareas[:resto]
 
     return lista_tareas
