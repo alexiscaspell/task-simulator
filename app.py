@@ -35,9 +35,10 @@ def insertar_eventos(eventos:List[Evento],mas_eventos:List[Evento]):
         tiempos_eventos = list(map(lambda ev: ev.tiempo, eventos))
 
         desplazamiento = bisect.bisect_right(tiempos_eventos, e.tiempo)
-        resto = len(eventos) - desplazamiento
+        # resto = len(eventos) - desplazamiento
 
-        eventos = eventos[desplazamiento:]+[e]+eventos[:resto]
+        # eventos = eventos[desplazamiento:]+[e]+eventos[:resto]
+        eventos.insert(desplazamiento,e)
 
     return eventos
         

@@ -15,12 +15,11 @@
         "funcion": "intervalo_arribo_hard",
         "modulo": "lobo_fdp"
     },
-    "archivo_datos": "./datos/tareas.json",
     "probabilidades_tareas": {
-        "imposible": 0.25,
-        "normal": 0.37,
         "facil": 0.31,
-        "dificil": 0.07
+        "normal": 0.37,
+        "dificil": 0.07,
+        "imposible": 0.25
     },
     "dias_laborales_mes": 20,
     "horas_laborales_dia": 8

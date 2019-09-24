@@ -44,7 +44,7 @@ class Tarea:
         self.tipo_tarea = TipoTarea(tarea_spec['tipo'])
         perfil=tarea_spec.get('perfil',None)
         self.perfil = PefilProgramador(perfil) if perfil is  not None else None
-        self.tiempo_creacion = tarea_spec.get('tiempo_creacion',fecha_string_a_tiempo_simulacion(tarea_spec["fecha_creacion"]))
+        self.tiempo_creacion = tarea_spec['tiempo_creacion'] if "tiempo_creacion" in tarea_spec else fecha_string_a_tiempo_simulacion(tarea_spec["fecha_creacion"])
         self.tiempo_inicio = tarea_spec.get('tiempo_inicio',None)
         self.tiempo_fin = tarea_spec.get('tiempo_fin',None)
 
@@ -96,16 +96,16 @@ def tipo_tarea_random() -> TipoTarea:
     tipos_tarea= [TipoTarea(t) for t in mapa_probabilidades]
     probabilidades= [mapa_probabilidades[t.value] for t in tipos_tarea]
     
-    return choice(tipos_tarea, size=1,p=probabilidades,replace=True)
+    return choice(tipos_tarea, size=1,p=probabilidades,replace=True)[0]
 
 def intervalo_arribo_tarea_random(tipo_tarea: TipoTarea) -> int:
     return configuracion.configuracion().intervalo_arribo_tarea(tipo_tarea)
 
 def tarea_random(tiempo_sistema: int) -> Tarea:
     una_tarea={}
-    una_tarea["tipo_tarea"] = tipo_tarea_random()
+    una_tarea["tipo"] = tipo_tarea_random()
     una_tarea["tiempo_creacion"] = tiempo_sistema + \
-        intervalo_arribo_tarea_random(una_tarea["tipo_tarea"])
+        intervalo_arribo_tarea_random(una_tarea["tipo"])
 
     return Tarea(una_tarea)
 
@@ -121,8 +121,10 @@ def tareas_random(tiempo_fin_simulacion: int) -> List[Tarea]:
 
         desplazamiento = bisect.bisect_right(
             tiempos_inicio_tareas, nueva_tarea.tiempo_creacion)
-        resto = len(lista_tareas) - desplazamiento
+        # resto = len(lista_tareas) - desplazamiento
 
-        lista_tareas[desplazamiento:resto] = [nueva_tarea]
+        lista_tareas.insert(desplazamiento,nueva_tarea)
+
+        # lista_tareas = lista_tareas[desplazamiento:] + [nueva_tarea] + lista_tareas[:resto]
 
     return lista_tareas
