@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from enum import Enum
 import builtins
 from typing import List,Callable
+from importlib import import_module
 
 config = None
 FORMATO_SALIDA_FECHA = "%d/%m/%yT%H:%M:%SZ"
@@ -48,7 +49,8 @@ class ModuloExterno():
         self.nombre_modulo = nombre_modulo_entero.split(".").pop()
         self.carpeta = nombre_modulo_entero.replace(f".{self.nombre_modulo}","").replace(self.nombre_modulo,"")
 
-        self.modulo = __import__(self.nombre_modulo, fromlist=[self.carpeta])
+        # self.modulo = __import__(self.nombre_modulo, fromlist=[self.carpeta])
+        self.modulo = import_module(nombre_modulo_entero)
         self.funcion = getattr(self.modulo,self.nombre_funcion)
 
     def path_a_modulo(self,path):

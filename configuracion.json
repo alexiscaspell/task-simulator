@@ -9,12 +9,12 @@
     "formato_fecha": "%d/%m/%yT%H:%M:%SZ",
     "tiempo_de_resolucion": {
         "funcion": "obtener_tiempo_resolucion",
-        "modulo": "fdps.py",
+        "modulo": "lobo_fdp/fdps.py",
         "unidad_tiempo":"minutos"
     },
     "intervalo_arribo_tareas": {
         "funcion": "obtener_intervalo_arribo",
-        "modulo": "fdps.py",
+        "modulo": "lobo_fdp/fdps.py",
         "unidad_tiempo":"minutos"
     },
     "probabilidades_tareas": {
