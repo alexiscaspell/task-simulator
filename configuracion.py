@@ -44,9 +44,11 @@ class UnidadTiempo(Enum):
 class ModuloExterno():
     def __init__(self, modulo_spec):
         self.nombre_funcion = modulo_spec["funcion"]
-        self.nombre_modulo = self.path_a_modulo(modulo_spec["modulo"])
+        nombre_modulo_entero = self.path_a_modulo(modulo_spec["modulo"])
+        self.nombre_modulo = nombre_modulo_entero.split(".").pop()
+        self.carpeta = nombre_modulo_entero.replace(f".{self.nombre_modulo}","").replace(self.nombre_modulo,"")
 
-        self.modulo = __import__(self.nombre_modulo, fromlist=[''])
+        self.modulo = __import__(self.nombre_modulo, fromlist=[self.carpeta])
         self.funcion = getattr(self.modulo,self.nombre_funcion)
 
     def path_a_modulo(self,path):
@@ -54,6 +56,15 @@ class ModuloExterno():
 
     def invocar(self, *args,**kwargs):
         return self.funcion(*args,**kwargs)
+
+class FuncionDeProbabilidad:
+    def __init__(self,fdp_spec):
+        self.unidad_tiempo = UnidadTiempo(fdp_spec.get("unidad_tiempo",UnidadTiempo.Minutos))
+        self.modulo = ModuloExterno(fdp_spec)
+
+    @property   
+    def funcion(self,*args,**kwargs):
+        return lambda *args,**kwargs: self.unidad_tiempo.llevar_a_segundos(self.modulo.funcion(*args,**kwargs))
 
 
 class Configuracion():
@@ -71,9 +82,9 @@ class Configuracion():
             configuracion_spec.get('unidad_tiempo', "segundos"))
         self.tiempo_fin_simulacion = self.unidad_tiempo.llevar_a_segundos(
             configuracion_spec['tiempo_fin_simulacion'])
-        self.intervalo_arribo_tarea:Callable = ModuloExterno(
+        self.intervalo_arribo_tarea:Callable = FuncionDeProbabilidad(
             configuracion_spec["intervalo_arribo_tareas"]).funcion
-        self.tiempo_de_resolucion:Callable = ModuloExterno(
+        self.tiempo_de_resolucion:Callable = FuncionDeProbabilidad(
             configuracion_spec["tiempo_de_resolucion"]).funcion
         self.dias_laborales_mes = configuracion_spec.get(
             "dias_laborales_mes", 20)

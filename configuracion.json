@@ -7,14 +7,15 @@
     "unidad_tiempo": "minutos",
     "fecha_inicial": "01/01/18T09:00:00Z",
     "formato_fecha": "%d/%m/%yT%H:%M:%SZ",
-    "archivo_datos": "./datos/tareas.json",
     "tiempo_de_resolucion": {
-        "funcion": "tiempo_resolucion_hard",
-        "modulo": "lobo_fdp"
+        "funcion": "obtener_tiempo_resolucion",
+        "modulo": "fdps.py",
+        "unidad_tiempo":"minutos"
     },
     "intervalo_arribo_tareas": {
-        "funcion": "intervalo_arribo_hard",
-        "modulo": "lobo_fdp"
+        "funcion": "obtener_intervalo_arribo",
+        "modulo": "fdps.py",
+        "unidad_tiempo":"minutos"
     },
     "probabilidades_tareas": {
         "facil": 0.31,
