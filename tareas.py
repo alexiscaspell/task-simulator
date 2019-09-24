@@ -9,6 +9,7 @@ from typing import Dict
 from configuracion import UnidadTiempo
 from datetime import datetime
 import time
+from math import ceil
 
 # ----------------------------------------------------
 # CLASES
@@ -113,7 +114,9 @@ def tarea_random(tiempo_sistema: int) -> Tarea:
 def tareas_random(tiempo_fin_simulacion: int) -> List[Tarea]:
     '''Retorna una lista de tareas random en base al tiempo de fin y los datos de simulacion de la configuracion'''
     lista_tareas = []
-    for t in range(0, configuracion.configuracion().tiempo_fin_simulacion):
+    t = 0
+
+    while (t<configuracion.configuracion().tiempo_fin_simulacion):
         nueva_tarea = tarea_random(t)
 
         tiempos_inicio_tareas = list(
@@ -124,6 +127,8 @@ def tareas_random(tiempo_fin_simulacion: int) -> List[Tarea]:
         # resto = len(lista_tareas) - desplazamiento
 
         lista_tareas.insert(desplazamiento,nueva_tarea)
+
+        t=nueva_tarea.tiempo_creacion
 
         # lista_tareas = lista_tareas[desplazamiento:] + [nueva_tarea] + lista_tareas[:resto]
 
