@@ -1,52 +1,40 @@
-import tareas
-from tareas import Tarea, TipoTarea
+from tareas import Tarea, TipoTarea,PefilProgramador
 from enum import Enum
 from numpy.random import choice
-from configuracion import tiempos_de_resolucion_probables_de
-
-
-class PefilProgramador(Enum):
-    Junior = "junior"
-    Semisenior = "semisenior"
-    Senior = "senior"
-
+import configuracion
 
 class Administrador:
     def __init__(self, nro_programadores):
         self.programadores = nro_programadores
         self.programadores_ocupados = 0
         self.tareas_en_progreso = []
-        self.perfil = None
+        self.perfil = self.perfil if isinstance(self.perfil,PefilProgramador) else None
+        self.tiempo_ocioso = 0
+        self.ultimo_tiempo_ocioso = 0
 
     def programadores_disponibles(self):
         return self.programadores-self.programadores_ocupados
+
+    def actualizar_tiempo_ocioso(self, tiempo):
+        self.tiempo_ocioso += (tiempo-self.ultimo_tiempo_ocioso) * \
+            self.programadores_disponibles()
+        self.ultimo_tiempo_ocioso = tiempo
 
     def alguien_puede_resolver(self, tarea: Tarea) -> bool:
         raise NotImplementedError(
             "Administrador no esta implementando 'alguien_puede_resolver'")
 
     def tiempo_resolucion_tarea(self, tarea):
-        tiempos_de_resolucion = self.tiempos_de_resolucion_probables(tarea)
-        try:
-            return choice([tdr[0] for tdr in tiempos_de_resolucion], size=1, p=[tdr[1] for tdr in tiempos_de_resolucion], replace=True)[0]
-        except Exception as e:
-            print(
-                f'HUBO UN ERROR CON LA PROBABILIDAD DE {tarea.tipo_tarea} y {self.perfil}')
-            raise e
+        return configuracion.tiempo_de_resolucion(self.perfil.value, tarea.tipo_tarea.value)
 
-    def tiempos_de_resolucion_probables(self, tarea):
-        return tiempos_de_resolucion_probables_de(self.perfil.value, tarea.tipo_tarea.value[0])
-
-    def poner_a_resolver_tarea(self, tarea):
+    def resolver_tarea(self, tiempo_actual, tarea)->Tarea:
         self.programadores_ocupados += 1
-        self.tareas_en_progreso.append(tarea)
-
-    def tenes_esta_tarea(self, tarea):
-        return tarea in self.tareas_en_progreso
+        tarea.tiempo_finalizacion = tiempo_actual + \
+            self.tiempo_resolucion_tarea(tarea)
+        return tarea
 
     def finalizar_tarea(self, tarea: Tarea):
         self.programadores_ocupados -= 1
-        self.tareas_en_progreso.remove(tarea)
 
 
 class AdministradorJuniors(Administrador):
@@ -55,7 +43,7 @@ class AdministradorJuniors(Administrador):
         Administrador.__init__(self, nro_programadores)
 
     def alguien_puede_resolver(self, tarea: Tarea) -> bool:
-        return self.programadores_disponibles() > 0 and tarea.tipo_tarea in [DificultadTarea.Simple, DificultadTarea.Complicada]
+        return self.programadores_disponibles() > 0 and tarea.tipo_tarea in [TipoTarea.Facil, TipoTarea.Normal]
 
 
 class AdministradorSemiseniors(Administrador):
@@ -64,7 +52,7 @@ class AdministradorSemiseniors(Administrador):
         Administrador.__init__(self, nro_programadores)
 
     def alguien_puede_resolver(self, tarea: Tarea) -> bool:
-        return self.programadores_disponibles() > 0 and tarea.tipo_tarea != DificultadTarea.Caotica
+        return self.programadores_disponibles() > 0 and tarea.tipo_tarea != TipoTarea.Imposible
 
 
 class AdministradorSeniors(Administrador):
@@ -74,3 +62,12 @@ class AdministradorSeniors(Administrador):
 
     def alguien_puede_resolver(self, tarea: Tarea) -> bool:
         return self.programadores_disponibles() > 0
+
+
+def crear_administrador(perfil: PefilProgramador, cantidad_programadores):
+    if perfil == PefilProgramador.Junior:
+        return AdministradorJuniors(cantidad_programadores)
+    elif perfil == PefilProgramador.Semisenior:
+        return AdministradorSemiseniors(cantidad_programadores)
+    elif perfil == PefilProgramador.Senior:
+        return AdministradorSeniors(cantidad_programadores)

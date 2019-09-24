@@ -4,29 +4,52 @@ from configuracion import Configuracion
 from enum import Enum
 import json
 import bisect
+from numpy.random import choice
+from typing import Dict
+from configuracion import UnidadTiempo
+from datetime import datetime
+import time
 
 # ----------------------------------------------------
 # CLASES
 # ----------------------------------------------------
 
+class PefilProgramador(Enum):
+    Junior = "junior"
+    Semisenior = "semisenior"
+    Senior = "senior"
 
 class TipoTarea(Enum):
-    Caotica = "Caotico"
-    Complicada = "Complicado"
-    Simple = "Simple"
-    Compleja = "Complejo"
+    Facil = "facil"
+    Normal = "normal"
+    Dificil = "dificil"
+    Imposible = "imposible"
 
+def string_a_fecha(fecha_en_string):
+    try:
+        datetime.strptime(fecha_en_string,configuracion.configuracion().formato_fecha)
+    except Exception:
+        return datetime.strptime(fecha_en_string,"%Y-%m-%d %H:%M:%S.%f")
+
+def fecha_string_a_tiempo_simulacion(fecha_en_string):
+    fecha = string_a_fecha(fecha_en_string)
+    
+    d1_ts = time.mktime(configuracion.configuracion().fecha_inicial.timetuple())
+    d2_ts = time.mktime(fecha.timetuple())
+    
+    return UnidadTiempo.Minutos.llevar_a_segundos(int(int(d2_ts-d1_ts) / 60))
 
 class Tarea:
     def __init__(self, tarea_spec: dict):
-        self.tipo_tarea = tarea_spec['tipo_tarea']
-        self.perfil = tarea_spec['perfil']
-        self.tiempo_creacion = tarea_spec['tiempo_creacion']
-        self.tiempo_inicio = tarea_spec['tiempo_inicio']
-        self.tiempo_fin = tarea_spec['tiempo_fin']
+        self.tipo_tarea = TipoTarea(tarea_spec['tipo'])
+        perfil=tarea_spec.get('perfil',None)
+        self.perfil = PefilProgramador(perfil) if perfil is  not None else None
+        self.tiempo_creacion = tarea_spec.get('tiempo_creacion',fecha_string_a_tiempo_simulacion(tarea_spec["fecha_creacion"]))
+        self.tiempo_inicio = tarea_spec.get('tiempo_inicio',None)
+        self.tiempo_fin = tarea_spec.get('tiempo_fin',None)
 
     def get_dict(self):
-        return {'tipo_tarea': None if self.tipo_tarea is None else self.tipo_tarea.value,
+        return {'tipo': None if self.tipo_tarea is None else self.tipo_tarea.value,
                 'perfil': None if self.perfil is None else self.perfil.value,
                 'tiempo_creacion': self.tiempo_creacion,
                 'tiempo_inicio': self.tiempo_inicio,
@@ -69,12 +92,14 @@ class Tarea:
 
 
 def tipo_tarea_random() -> TipoTarea:
-    raise NotImplementedError()
-
+    mapa_probabilidades:Dict=configuracion.configuracion().probabilidades_tareas
+    tipos_tarea= [TipoTarea(t) for t in mapa_probabilidades]
+    probabilidades= [mapa_probabilidades[t.value] for t in tipos_tarea]
+    
+    return choice(tipos_tarea, size=1,p=probabilidades,replace=True)
 
 def intervalo_arribo_tarea_random(tipo_tarea: TipoTarea) -> int:
-    return 0
-
+    return configuracion.configuracion().intervalo_arribo_tarea(tipo_tarea)
 
 def tarea_random(tiempo_sistema: int) -> Tarea:
     una_tarea={}

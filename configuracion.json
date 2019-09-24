@@ -1,0 +1,20 @@
+{
+    "cantidad_juniors": 1,
+    "cantidad_semiseniors": 1,
+    "cantidad_seniors": 1,
+    "tiempo_fin_simulacion": 2880,
+    "unidad_tiempo": "horas",
+    "fecha_inicial": "01/05/19T09:00:00Z",
+    "formato_fecha": "%d/%m/%yT%H:%M:%SZ",
+    "tiempo_de_resolucion":{"funcion":"tiempo_resolucion_hard","modulo":"lobo_fdp"},
+    "intervalo_arribo_tareas": {"funcion":"intervalo_arribo_hard","modulo":"lobo_fdp"},
+    "archivo_datos":"./datos/tareas.json",
+    "probabilidades_tareas": {
+        "imposible": 0.25,
+        "normal": 0.37,
+        "facil": 0.31,
+        "dificil": 0.07
+    },
+    "dias_laborales_mes": 20,
+    "horas_laborales_dia": 8
+}

@@ -102,3 +102,11 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+.vs/
+
+.vscode/
+
+venv3.7.3/Include/
+
+venv3.7.3/

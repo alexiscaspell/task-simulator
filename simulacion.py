@@ -2,7 +2,14 @@ import configuracion
 import tareas
 from tareas import TipoTarea
 from abc import ABCMeta
+from typing import List,Tuple
+from administradores import Administrador
+from tareas import Tarea
 
+class Metrica(ABCMeta):
+    def calcular(self, simulacion):
+        raise NotImplementedError(
+            "Metodo a implementar por metrica no cumplido")
 
 class FactoryMetricas:
 
@@ -10,32 +17,95 @@ class FactoryMetricas:
     def crear(metric_spec: dict) -> Metrica:
         raise NotImplementedError()
 
+###########################################################--- SIMULACION ---###########################################################
+class Evento:
+    def __init__(self,tarea):
+        self.tarea = tarea
+    @property    
+    def tiempo(self):
+        raise NotImplementedError("Propiedad tiempo no encontrada")
+
+class EventoLlegada(Evento):
+    def __init__(self,tarea):
+        if not tarea:
+            raise ValueError("No se paso una tarea para el evento de llegada")
+        self.tarea = tarea
+
+    @property    
+    def tiempo(self):
+        return self.tarea.tiempo_creacion
+
+class EventoSalida(Evento):
+    def __init__(self,tarea):
+        if not tarea:
+            raise ValueError("No se paso una tarea para el evento de salida")
+        self.tarea = tarea
+
+    @property    
+    def tiempo(self):
+        return self.tarea.tiempo_finalizacion
+
+def crear_eventos_llegada(tareas:List[Tarea])->List[EventoLlegada]:
+    return list(map(lambda t: EventoLlegada(t),tareas))
+    
+def crear_eventos_salida(tareas:List[Tarea])->List[EventoSalida]:
+    try:
+        return list(map(lambda t: EventoLlegada(t),tareas))
+    except Exception:
+        print(f"TAREAS A SALIR: {tareas}")
 
 class Simulacion:
-    def __init__(self, configuracion, lista_tareas):
+    def __init__(self, configuracion, lista_tareas, administradores):
         self.configuracion = configuracion
         self.tareas = lista_tareas
-        metricas_spec = configuracion.configuracion().metricas_spec()
+        self.tareas_finalizadas = []
+        metricas_spec = self.configuracion.metricas_spec
         self.metricas = list(
             map(lambda m: FactoryMetricas.crear(m), metricas_spec))
         self.tiempo_sistema = 0
+        self.administradores = administradores
 
-    def finalizar_tareas(self):
-        raise NotImplementedError("No implementado aun")
+    def _asignar(self, lista_tareas: List[Tarea]) -> Tuple[List,List]:
+        '''Asigna las tareas que pueden ser asignadas y retorna tupla tareas_asignadas,tareas_sin_asignar'''
+        tareas_sin_asignar = []
+        tareas_asignadas = []
 
-    def incrementar_tiempo_sistema(self):
-        self.tiempo_sistema += 1
+        while len(lista_tareas) > 0:
+            tarea = lista_tareas.pop()
 
-    def metricas(self):
+            for admin in self.administradores:
+                if admin.alguien_puede_resolver(tarea):
+                    tarea_actualizada = admin.resolver_tarea(self.tiempo_sistema,tarea)
+                    tareas_asignadas.append(tarea_actualizada)
+                else:
+                    tareas_sin_asignar.append(tarea)
+
+        return tareas_asignadas,tareas_sin_asignar
+
+    def resolver(self,evento:Evento):
+        '''Resuelve dependiendo del tipo de evento y retorna los nuevos eventos condicionales y no condicionales'''
+        llegadas=[]
+        salidas=[]
+
+        for a in self.administradores:
+            a.actualizar_tiempo_ocioso(self.tiempo_sistema)
+
+        if(isinstance(evento,EventoLlegada)):
+            asignadas,sin_asignar = self._asignar([evento.tarea])
+            llegadas = crear_eventos_llegada(sin_asignar)
+            salidas = crear_eventos_salida(asignadas)
+            self.tareas_finalizadas = self.tareas_finalizadas + asignadas
+
+        elif isinstance(evento,EventoSalida):
+            admin = next(a for a in self.administradores if a.perfil==evento.tarea.perfil)
+            admin.finalizar_tarea(evento.tarea)
+
+        return llegadas+salidas
+
+    def resultado_metricas(self):
         return list(map(lambda m: m.calcular(self), self.metricas))
 
-
-class Metrica(ABCMeta):
-    def calcular(self, simulacion: Simulacion):
-        raise NotImplementedError(
-            "Metodo a implementar por metrica no cumplido")
-
-
+###########################################################--- METRICAS ---###########################################################
 class TiempoOcioso(Metrica):
 
     def calcular(self):
