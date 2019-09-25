@@ -34,11 +34,13 @@ def string_a_fecha(fecha_en_string):
 
 def fecha_string_a_tiempo_simulacion(fecha_en_string):
     fecha = string_a_fecha(fecha_en_string)
+
+    return int((fecha-configuracion.configuracion().fecha_inicial).total_seconds())
     
-    d1_ts = time.mktime(configuracion.configuracion().fecha_inicial.timetuple())
-    d2_ts = time.mktime(fecha.timetuple())
+    # d1_ts = time.mktime(configuracion.configuracion().fecha_inicial.timetuple())
+    # d2_ts = time.mktime(fecha.timetuple())
     
-    return UnidadTiempo.Minutos.llevar_a_segundos(int(int(d2_ts-d1_ts) / 60))
+    # return UnidadTiempo.Minutos.llevar_a_segundos(int(int(d2_ts-d1_ts) / 60))
 
 class Tarea:
     def __init__(self, tarea_spec: dict):
@@ -61,9 +63,9 @@ class Tarea:
                 'tiempo_creacion': self.tiempo_creacion,
                 'tiempo_inicio': self.tiempo_inicio,
                 'tiempo_fin': self.tiempo_fin,
-                'fecha_creacion': self.fecha_creacion(),
-                'fecha_inicio': self.fecha_inicio(),
-                'fecha_fin': self.fecha_fin()
+                'fecha_creacion': str(self.fecha_creacion()),
+                'fecha_inicio': str(self.fecha_inicio()),
+                'fecha_fin': str(self.fecha_fin())
                 }
 
     def fecha_creacion(self):

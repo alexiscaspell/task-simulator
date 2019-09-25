@@ -78,7 +78,6 @@ def simular(simulacion:Simulacion)->Tuple[Simulacion,List]:
 
         nuevos_eventos = simulacion.resolver(evento)
 
-
         #SE DESCARTAN LOS EVENTOS CON t>=tiempo_fin
         # nuevos_eventos_filtrados = list(filter(lambda e:e.tiempo<simulacion.tiempo_fin,nuevos_eventos))
 
@@ -91,7 +90,6 @@ def simular(simulacion:Simulacion)->Tuple[Simulacion,List]:
     print(f"TIEMPO FINAL: {simulacion.tiempo_sistema}")
     print(f"PROCESADOS {procesados} EVENTOS")
 
-    
     return simulacion,simulacion.resultado_metricas()
 
 if __name__ == "__main__":

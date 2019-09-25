@@ -9,6 +9,29 @@ from importlib import import_module
 config = None
 FORMATO_SALIDA_FECHA = "%d/%m/%yT%H:%M:%SZ"
 
+def cambiar_a_hora_laboral(fecha: datetime,horario_laboral_inicial,horario_laboral_salida) -> datetime:
+
+    cumple_dia_laboral = fecha.strftime("%A") != "Saturday" and fecha.strftime("%A") != "Sunday"
+    cumple_hora_laboral = horario_laboral_inicial <= fecha.hour <= horario_laboral_salida
+    
+    if not cumple_dia_laboral:
+        dias_a_sumar = 1 if fecha.strftime("%A") == "Sunday" else 2
+        return cambiar_a_hora_laboral(fecha + timedelta(days=dias_a_sumar),horario_laboral_inicial,horario_laboral_salida)        
+
+    if not cumple_hora_laboral:
+        
+        if fecha.hour < horario_laboral_inicial:
+            fecha = fecha.replace(hour=24 - horario_laboral_salida + horario_laboral_inicial + fecha.hour)
+            fecha += timedelta(days=1)
+
+        if horario_laboral_salida < fecha.hour:
+            fecha = fecha.replace(hour=horario_laboral_inicial + fecha.hour - horario_laboral_salida)
+            fecha += timedelta(days=1)
+        
+        return cambiar_a_hora_laboral(fecha,horario_laboral_inicial,horario_laboral_salida)
+
+    return fecha
+
 
 def print(algo, logging=None):
     if logging or configuracion and config.logging:
@@ -84,14 +107,16 @@ class Configuracion():
         self.cantidad_semiseniors = configuracion_spec['cantidad_semiseniors']
         self.cantidad_seniors = configuracion_spec['cantidad_seniors']
         self.archivo_datos = configuracion_spec.get('archivo_datos',None)
+
+        if not configuracion_spec.get("cargar_de_archivo",False):
+            self.archivo_datos = None
+
         self.formato_fecha = configuracion_spec.get(
             "formato_fecha", "%d/%m/%y")
         self.fecha_inicial = datetime.strptime(configuracion_spec.get(
             'fecha_inicial', datetime.strftime(datetime.now(), self.formato_fecha)), self.formato_fecha)
-        self.unidad_tiempo = UnidadTiempo(
-            configuracion_spec.get('unidad_tiempo', "segundos"))
-        self.tiempo_fin_simulacion = self.unidad_tiempo.llevar_a_segundos(
-            configuracion_spec['tiempo_fin_simulacion'])
+        self.unidad_tiempo = UnidadTiempo(configuracion_spec.get('unidad_tiempo', "segundos"))
+        self.tiempo_fin_simulacion = self.unidad_tiempo.llevar_a_segundos(configuracion_spec['tiempo_fin_simulacion'])
         self.intervalo_arribo_tarea:Callable = FuncionDeProbabilidad(
             configuracion_spec["intervalo_arribo_tareas"]).funcion
         self.tiempo_de_resolucion:Callable = FuncionDeProbabilidad(
@@ -108,17 +133,9 @@ class Configuracion():
         return self.calcular_fecha(self.fecha_inicial, self.tiempo_fin_simulacion, UnidadTiempo.Segundos)
 
     def calcular_fecha(self, fecha_inicial: datetime, tiempo_fin: int, unidad_tiempo: UnidadTiempo = UnidadTiempo.Segundos) -> datetime:
-        tiempo_fin_minutos = unidad_tiempo.llevar_a_minutos(tiempo_fin)
-        HORAS_LABORALES = self.horas_laborales_dia
-        DIAS_LABORALES = self.dias_laborales_mes
-        dias = round(tiempo_fin_minutos/(HORAS_LABORALES*60))
-        meses_laborales = round(dias/DIAS_LABORALES)
-        dias_laborales = round(max(meses_laborales*30, dias))
-        minutos = tiempo_fin_minutos-dias*HORAS_LABORALES*60
-        # print(f"CALCULANDO FECHA CON: tm:{tiempo_fin_minutos},d:{dias},ml:{meses_laborales},dl:{dias_laborales},m:{minutos}",logging=self.logging)
-        fecha_fin = fecha_inicial + \
-            timedelta(days=dias_laborales)+timedelta(minutes=minutos)
-        return fecha_fin
+        fecha_fin = fecha_inicial + timedelta(minutes=unidad_tiempo.llevar_a_minutos(tiempo_fin))
+
+        return cambiar_a_hora_laboral(fecha_fin,fecha_inicial.hour,fecha_inicial.hour+self.horas_laborales_dia)
 
     def __str__(self):
         return str(self.dict())

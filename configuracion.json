@@ -1,21 +1,21 @@
 {
-    "cantidad_juniors": 2,
-    "cantidad_semiseniors": 2,
-    "cantidad_seniors": 2,
+    "cantidad_juniors": 10,
+    "cantidad_semiseniors": 10,
+    "cantidad_seniors": 10,
     "tiempo_fin_simulacion": 172800,
     "logging": true,
-    "archivo_datos": "./datos/tareas.json",
     "unidad_tiempo": "minutos",
     "fecha_inicial": "01/01/18T09:00:00Z",
     "formato_fecha": "%d/%m/%yT%H:%M:%SZ",
+    "archivo_datos":"./datos/tareas.json",
     "tiempo_de_resolucion": {
-        "funcion": "obtener_tiempo_resolucion",
-        "modulo": "lobo_fdp/fdps.py",
+        "funcion": "obtener_tiempo_resolucion_hard",
+        "modulo": "fdps_hard.py",
         "unidad_tiempo": "minutos"
     },
     "intervalo_arribo_tareas": {
-        "funcion": "obtener_intervalo_arribo",
-        "modulo": "lobo_fdp/fdps.py",
+        "funcion": "obtener_intervalo_arribo_hard",
+        "modulo": "fdps_hard.py",
         "unidad_tiempo": "minutos"
     },
     "probabilidades_tareas": {
