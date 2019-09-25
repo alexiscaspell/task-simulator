@@ -1,6 +1,6 @@
 import datetime
-import time
 import json
+import time
 
 # import dateutil.parser
 import matplotlib.pyplot as plt
@@ -8,9 +8,9 @@ import numpy as np
 import pylab
 import scipy
 import scipy.stats
+from fitter import Fitter
 from numpy.polynomial.polynomial import Polynomial
 from scipy.optimize import curve_fit
-from fitter import Fitter
 
 FECHA_INICIAL_SIMULACION = datetime.datetime(2018, 1, 1)
 
@@ -123,9 +123,33 @@ def ver_tiempos_salidas(tipo_perfil):
     plt.show()
 
 
-def ver_funciones_aproximadas_salidas(tipo_perfil):
+def generar_funcion_aproximada_llegadas(graficar = False):
 
-    print(f"PERFIL: {tipo_perfil}\n")
+    print(f"LLEGADAS\n")
+
+    def funcion_aproximante(x, a, b):
+        return (a**x) - b
+
+    y = obtener_intervalos_tiempos_llegada()
+    y.sort()
+    x = np.linspace(0, 1, num=len(y))
+
+    param, param_cov = curve_fit(funcion_aproximante, x, y)
+    print(f'COEFICIENTES DE LA FUNCION: {[e for e in param]}\n')
+
+    if not graficar: return
+
+    ans = (param[0]**x) - param[1]
+
+    plt.plot(x, y, 'o', color='red', label="data")
+    plt.plot(x, ans, '--', color='blue', label="optimized data")
+    plt.legend()
+    plt.show()
+
+
+def generar_funcion_aproximada_salidas(tipo_perfil, graficar = False):
+
+    print(f"SALIDAS DE PERFIL: {tipo_perfil}\n")
 
     data = obtener_tiempos_resolucion(tipo_perfil)
     data.sort()
@@ -148,33 +172,13 @@ def ver_funciones_aproximadas_salidas(tipo_perfil):
     print(f"CANT. COORDENADAS: {len(coordenadas)}")
     print(f"\n")
 
-    polinomio = scipy.interpolate.lagrange(
-        x[0:len(coordenadas)], y[0:len(coordenadas)])
+    polinomio = scipy.interpolate.lagrange(x[0:len(coordenadas)], y[0:len(coordenadas)])
     print(f'POLINOMIO: \n{[e for e in Polynomial(polinomio).coef]}\n\n')
     print(f'MAXIMO POSIBLE: {coordenadas[-1]}\n\n')
 
+    if not graficar: return
     plt.plot(x, y, 'o', x, y, '-', x, polinomio(x), '--')
     plt.legend(['puntos', 'interpolacion', 'polinomio'], loc='best')
-    plt.show()
-
-
-def ver_funciones_aproximadas_llegada():
-
-    def funcion_aproximante(x, a, b):
-        return (a**x) - b
-
-    y = obtener_intervalos_tiempos_llegada()
-    y.sort()
-    x = np.linspace(0, 1, num=len(y))
-
-    param, param_cov = curve_fit(funcion_aproximante, x, y)
-    print(f'COEFICIENTES DE LA FUNCION: {param}')
-
-    ans = (param[0]**x) - param[1]
-
-    plt.plot(x, y, 'o', color='red', label="data")
-    plt.plot(x, ans, '--', color='blue', label="optimized data")
-    plt.legend()
     plt.show()
 
 
@@ -192,8 +196,8 @@ if __name__ == "__main__":
     # ver_tiempos_salidas(SENIOR)
 
     # APROXIMACIONES
-    # ver_funciones_aproximadas_llegada()
+    generar_funcion_aproximada_llegadas()
 
-    ver_funciones_aproximadas_salidas(JUNIOR)
-    # ver_funciones_aproximadas_salidas(SEMISENIOR)
-    # ver_funciones_aproximadas_salidas(SENIOR)
+    generar_funcion_aproximada_salidas(JUNIOR)
+    generar_funcion_aproximada_salidas(SEMISENIOR)
+    generar_funcion_aproximada_salidas(SENIOR)
