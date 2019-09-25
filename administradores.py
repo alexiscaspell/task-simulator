@@ -16,6 +16,9 @@ class Administrador:
         return self.programadores-self.programadores_ocupados
 
     def actualizar_tiempo_ocioso(self, tiempo):
+        if tiempo<self.ultimo_tiempo_ocioso:
+            return
+
         self.tiempo_ocioso += (tiempo-self.ultimo_tiempo_ocioso) * \
             self.programadores_disponibles()
         self.ultimo_tiempo_ocioso = tiempo
@@ -30,7 +33,7 @@ class Administrador:
     def resolver_tarea(self, tiempo_actual, tarea)->Tarea:
         self.programadores_ocupados += 1
         tarea.perfil=self.perfil
-        tarea.tiempo_finalizacion = tiempo_actual + \
+        tarea.tiempo_fin = tiempo_actual + \
             self.tiempo_resolucion_tarea(tarea)
         return tarea
 

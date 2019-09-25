@@ -54,6 +54,7 @@ def simular(simulacion:Simulacion)->List[Metrica]:
 
     print("Comenzando simulacion ...")
 
+    #SOLO SE SIMULA LO QUE ESTA DENTRO DEL RANGO DE TIEMPO
     simulacion.lista_tareas = list(filter(lambda t:t.tiempo_creacion<simulacion.tiempo_fin,simulacion.tareas))
 
     eventos = crear_eventos_llegada(simulacion.lista_tareas)
@@ -61,8 +62,8 @@ def simular(simulacion:Simulacion)->List[Metrica]:
     procesados=0
     total=len(eventos)
 
-    # while(simulacion.tiempo_sistema<simulacion.tiempo_fin):
-    while(len(eventos)>0):
+    while(simulacion.tiempo_sistema<simulacion.tiempo_fin):
+    # while(len(eventos)>0):
 
         procesados +=1
 
@@ -75,6 +76,11 @@ def simular(simulacion:Simulacion)->List[Metrica]:
 
         nuevos_eventos = simulacion.resolver(evento)
 
+
+        #SE DESCARTAN LOS EVENTOS CON t>=tiempo_fin
+        # nuevos_eventos_filtrados = list(filter(lambda e:e.tiempo<simulacion.tiempo_fin,nuevos_eventos))
+
+        # eventos = insertar_eventos(eventos,nuevos_eventos_filtrados)
         eventos = insertar_eventos(eventos,nuevos_eventos)
 
         if procesados%ceil(0.1*total)==0:

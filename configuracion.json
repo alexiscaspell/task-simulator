@@ -26,5 +26,5 @@
     },
     "dias_laborales_mes": 20,
     "horas_laborales_dia": 8,
-    "metricas":[{"nombre":"tiempo_ocioso"}]
+    "metricas":[{"nombre":"porcentaje_tareas_realizadas"},{"nombre":"tiempo_ocioso"},{"nombre":"tiempo_resolucion_promedio"}]
 }

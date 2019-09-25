@@ -51,7 +51,7 @@ class EventoSalida(Evento):
 
     @property    
     def tiempo(self):
-        return self.tarea.tiempo_finalizacion
+        return self.tarea.tiempo_fin
 
 def crear_eventos_llegada(tareas:List[Tarea])->List[EventoLlegada]:
     return list(map(lambda t: EventoLlegada(t),tareas))
@@ -64,6 +64,7 @@ class Simulacion:
         self.configuracion = configuracion
         self.tareas = lista_tareas
         self.tareas_finalizadas = []
+        self.tareas_asignadas = []
         metricas_spec = self.configuracion.metricas_spec
         self.metricas = list(
             map(lambda m: FactoryMetricas.crear(m), metricas_spec))
@@ -106,12 +107,15 @@ class Simulacion:
             asignadas,sin_asignar = self._asignar([evento.tarea])
             llegadas = crear_eventos_llegada(sin_asignar)
             salidas = crear_eventos_salida(asignadas)
-            self.tareas_finalizadas = self.tareas_finalizadas + asignadas
+
+            #ACA SE GUARDAN LAS TAREAS QUE SE COMENZARON Y NUNCA SE TERMINARON
+            self.tareas_asignadas = self.tareas_asignadas+list(filter(lambda t:t.tiempo_fin>=self.tiempo_fin,asignadas))
 
         elif isinstance(evento,EventoSalida):
             print(f"SALIDA DE {evento.tarea.perfil.value} ...")
             admin = next(a for a in self.administradores if a.perfil==evento.tarea.perfil)
             admin.finalizar_tarea(evento.tarea)
+            self.tareas_finalizadas.append(evento.tarea)
 
         return llegadas+salidas
 
@@ -144,11 +148,11 @@ class TiempoDeResolucionPromedio:
         tiempos_promedio_por_tipo_tarea = []
 
         for tipo_tarea in TipoTarea:
-            tareas_de_tipo_tarea = list(
+            tareas_de_tipo_tarea:List[Tarea] = list(
                 filter(lambda t: t.tipo_tarea == tipo_tarea, simulacion.tareas_finalizadas))
             cant_tareas = max(len(tareas_de_tipo_tarea), 1)
-            promedio = sum(map(lambda t: t.fecha_fin -
-                               t.fecha_creacion, tareas_de_tipo_tarea))/cant_tareas
+                
+            promedio = sum(map(lambda t: t.tiempo_fin - t.tiempo_creacion, tareas_de_tipo_tarea))/cant_tareas
             tiempos_promedio_por_tipo_tarea.append(
                 {tipo_tarea.value: promedio})
 
