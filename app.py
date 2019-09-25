@@ -32,24 +32,24 @@ def realizar_simulacion(tareas_file_path:str=None)->Tuple[Simulacion,List]:
 
     return simular(data)
 
-def insertar_eventos(eventos:List[Evento],mas_eventos:List[Evento]):
-    if len(eventos)>0:
-        mas_eventos = [eventos.pop(0)]+mas_eventos
-
-    return mas_eventos+eventos
-
 # def insertar_eventos(eventos:List[Evento],mas_eventos:List[Evento]):
+#     if len(eventos)>0:
+#         mas_eventos = [eventos.pop(0)]+mas_eventos
 
-#     for e in mas_eventos:
-#         tiempos_eventos = list(map(lambda ev: ev.tiempo, eventos))
+#     return mas_eventos+eventos
 
-#         desplazamiento = bisect.bisect_right(tiempos_eventos, e.tiempo)
-#         # resto = len(eventos) - desplazamiento
+def insertar_eventos(eventos:List[Evento],mas_eventos:List[Evento]):
 
-#         # eventos = eventos[desplazamiento:]+[e]+eventos[:resto]
-#         eventos.insert(desplazamiento,e)
+    for e in mas_eventos:
+        tiempos_eventos = list(map(lambda ev: ev.tiempo, eventos))
 
-#     return eventos
+        desplazamiento = bisect.bisect_right(tiempos_eventos, e.tiempo)
+        # resto = len(eventos) - desplazamiento
+
+        # eventos = eventos[desplazamiento:]+[e]+eventos[:resto]
+        eventos.insert(desplazamiento,e)
+
+    return eventos
         
 
 def simular(simulacion:Simulacion)->Tuple[Simulacion,List]:
