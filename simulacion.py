@@ -13,14 +13,19 @@ import numpy as np
 class Metrica(ABCMeta):
     def __init__(self,metrica_spec):
         self.nombre = metrica_spec["nombre"]
-        self.formato_grafico = metrica_spec.get("formato_grafico","svg")
+
+        grafico = metrica_spec.get("grafico",{})
+        self.formato_grafico = grafico.get("extension","svg")
+        self.guardar_grafico = grafico.get("activo",False)
+        self.path_grafico = grafico.get("nombre_archivo",self.nombre)
 
     def calcular(self, simulacion):
         raise NotImplementedError(
             "Metodo a implementar por metrica no cumplido")
             
-    def guardar_grafico(self,nombre):
-        plt.savefig(f"{nombre}.{self.formato_grafico}", format=self.formato_grafico)
+    def guardar_grafico(self):
+        if self.guardar_grafico:
+            plt.savefig(f"{self.path_grafico}.{self.formato_grafico}", format=self.formato_grafico)
         plt.close()
 
 class FactoryMetricas:
@@ -154,7 +159,7 @@ class TiempoOcioso:
         plt.bar(x, tiempos_ocio)
         plt.xticks(x, tuple([k for k in self.resultado]))
         
-        Metrica.guardar_grafico(self,"tiempo_ocioso")
+        Metrica.guardar_grafico(self)
 
 class TiempoDeResolucionPromedio:
 
@@ -184,7 +189,7 @@ class TiempoDeResolucionPromedio:
         x = np.arange(len(self.resultado))
         plt.bar(x, tiempos_promedio)
         plt.xticks(x, tuple([k for k in self.resultado]))
-        Metrica.guardar_grafico(self,"tiempo_resolucion_promedio")
+        Metrica.guardar_grafico(self)
 
 class PorcentajeDeTareasRealizadas:
     
@@ -208,7 +213,7 @@ class PorcentajeDeTareasRealizadas:
         plt.legend(patches, labels, loc="best")
         plt.axis('equal')
         plt.tight_layout()
-        Metrica.guardar_grafico(self,"tareas_realizadas")
+        Metrica.guardar_grafico(self)
 
 if __name__ == "__main__":
     pass

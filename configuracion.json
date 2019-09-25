@@ -1,7 +1,7 @@
 {
     "cantidad_juniors": 1,
     "cantidad_semiseniors": 1,
-    "cantidad_seniors": 1,
+    "cantidad_seniors": 4,
     "tiempo_fin_simulacion": 172800,
     "logging": true,
     "unidad_tiempo": "minutos",
@@ -20,24 +20,36 @@
     "probabilidades_tareas": {
         "facil": 0.31,
         "normal": 0.37,
-        "dificil": 0.07,
-        "imposible": 0.25
+        "dificil": 0.25,
+        "imposible": 0.07
     },
-    "dias_laborales_mes": 20,
-    "horas_laborales_dia": 8,
+    "dias_laborales_mes": 22,
+    "horas_laborales_dia": 9,
     "metricas": [
         {
             "nombre": "porcentaje_tareas_realizadas",
-            "formato_grafico": "png"
+            "grafico":{
+                "activo":true,
+                "nombre_archivo":"./graficos/tareas_realizadas",
+                "extension":"png"
+            }
         },
         {
             "nombre": "tiempo_ocioso",
-            "formato_grafico": "png"
+            "grafico":{
+                "activo":true,
+                "nombre_archivo":"./graficos/tiempo_ocioso",
+                "extension":"png"
+            }
         },
         {
             "nombre": "tiempo_resolucion_promedio",
             "unidad_tiempo": "horas",
-            "formato_grafico": "png"
+            "grafico":{
+                "activo":true,
+                "nombre_archivo":"./graficos/tiempo_resolucion_promedio",
+                "extension":"png"
+            }
         }
     ]
 }
