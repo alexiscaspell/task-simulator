@@ -1,4 +1,4 @@
-from typing import List
+from typing import List,Tuple
 from simulacion import Simulacion,Metrica,crear_eventos_llegada,Evento
 from tareas import Tarea,tareas_random,string_a_fecha
 import bisect
@@ -7,6 +7,8 @@ from configuracion import Configuracion,print
 import json
 from math import ceil
 from administradores import Administrador,crear_administrador,PefilProgramador
+import matplotlib.pyplot as plt
+
 
 def cargar_tareas(path:str)->List[Tarea]:
     if not path:
@@ -18,7 +20,7 @@ def cargar_tareas(path:str)->List[Tarea]:
 
     return [Tarea(t) for t in tareas_specs]
 
-def realizar_simulacion(tareas_file_path:str=None)->List[Metrica]:
+def realizar_simulacion(tareas_file_path:str=None)->Tuple[Simulacion,List]:
     lista_tareas = cargar_tareas(tareas_file_path)
 
     if not lista_tareas:
@@ -50,7 +52,7 @@ def insertar_eventos(eventos:List[Evento],mas_eventos:List[Evento]):
 #     return eventos
         
 
-def simular(simulacion:Simulacion)->List[Metrica]:
+def simular(simulacion:Simulacion)->Tuple[Simulacion,List]:
 
     print("Comenzando simulacion ...")
 
@@ -90,8 +92,12 @@ def simular(simulacion:Simulacion)->List[Metrica]:
     print(f"PROCESADOS {procesados} EVENTOS")
 
     
-    return simulacion.resultado_metricas()
+    return simulacion,simulacion.resultado_metricas()
 
 if __name__ == "__main__":
-    resultados = realizar_simulacion(configuracion.configuracion().archivo_datos)
+    simulacion,resultados = realizar_simulacion(configuracion.configuracion().archivo_datos)
+
     print(f"RESULTADOS: {resultados}")
+
+    for m in simulacion.metricas:
+        m.generar_grafico()

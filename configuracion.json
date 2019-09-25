@@ -27,14 +27,17 @@
     "horas_laborales_dia": 8,
     "metricas": [
         {
-            "nombre": "porcentaje_tareas_realizadas"
+            "nombre": "porcentaje_tareas_realizadas",
+            "formato_grafico": "png"
         },
         {
-            "nombre": "tiempo_ocioso"
+            "nombre": "tiempo_ocioso",
+            "formato_grafico": "png"
         },
         {
             "nombre": "tiempo_resolucion_promedio",
-            "unidad_tiempo": "horas"
+            "unidad_tiempo": "horas",
+            "formato_grafico": "png"
         }
     ]
 }

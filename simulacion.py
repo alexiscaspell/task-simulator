@@ -6,14 +6,22 @@ from typing import List,Tuple
 from administradores import Administrador
 from tareas import Tarea
 from configuracion import UnidadTiempo
+import matplotlib.pyplot as plt
+import numpy as np
+
 
 class Metrica(ABCMeta):
     def __init__(self,metrica_spec):
         self.nombre = metrica_spec["nombre"]
+        self.formato_grafico = metrica_spec.get("formato_grafico","svg")
 
     def calcular(self, simulacion):
         raise NotImplementedError(
             "Metodo a implementar por metrica no cumplido")
+            
+    def guardar_grafico(self,nombre):
+        plt.savefig(f"{nombre}.{self.formato_grafico}", format=self.formato_grafico)
+        plt.close()
 
 class FactoryMetricas:
 
@@ -140,6 +148,14 @@ class TiempoOcioso:
 
         return self.resultado
 
+    def generar_grafico(self):
+        tiempos_ocio = self.resultado.values()
+        x = np.arange(len(self.resultado))
+        plt.bar(x, tiempos_ocio)
+        plt.xticks(x, tuple([k for k in self.resultado]))
+        
+        Metrica.guardar_grafico(self,"tiempo_ocioso")
+
 class TiempoDeResolucionPromedio:
 
     def __init__(self,data):
@@ -147,7 +163,7 @@ class TiempoDeResolucionPromedio:
         Metrica.__init__(self,data)
 
     def calcular(self, simulacion: Simulacion):
-        tiempos_promedio_por_tipo_tarea = []
+        tiempos_promedio_por_tipo_tarea = {}
 
         for tipo_tarea in TipoTarea:
             tareas_de_tipo_tarea:List[Tarea] = list(
@@ -156,12 +172,19 @@ class TiempoDeResolucionPromedio:
                 
             promedio = sum(map(lambda t: t.tiempo_fin - t.tiempo_creacion, tareas_de_tipo_tarea))/cant_tareas
             promedio = UnidadTiempo.Segundos.llevar_a(self.unidad_tiempo,promedio)
-            tiempos_promedio_por_tipo_tarea.append(
+            tiempos_promedio_por_tipo_tarea.update(
                 {tipo_tarea.value: promedio})
 
         self.resultado = tiempos_promedio_por_tipo_tarea
 
         return self.resultado
+
+    def generar_grafico(self):
+        tiempos_promedio = self.resultado.values()
+        x = np.arange(len(self.resultado))
+        plt.bar(x, tiempos_promedio)
+        plt.xticks(x, tuple([k for k in self.resultado]))
+        Metrica.guardar_grafico(self,"tiempo_resolucion_promedio")
 
 class PorcentajeDeTareasRealizadas:
     
@@ -176,6 +199,16 @@ class PorcentajeDeTareasRealizadas:
         self.resultado =  H/total
 
         return self.resultado
+
+    def generar_grafico(self):
+        labels = ['Hechas', 'Restantes']
+        sizes = [self.resultado*100,(1-self.resultado)*100]
+        colors = ['lightskyblue', 'gold']
+        patches, texts = plt.pie(sizes, colors=colors, shadow=True, startangle=90)
+        plt.legend(patches, labels, loc="best")
+        plt.axis('equal')
+        plt.tight_layout()
+        Metrica.guardar_grafico(self,"tareas_realizadas")
 
 if __name__ == "__main__":
     pass
