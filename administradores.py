@@ -6,21 +6,24 @@ import configuracion
 class Administrador:
     def __init__(self, nro_programadores):
         self.programadores = nro_programadores
-        self.programadores_ocupados = 0
-        self.tareas_en_progreso = []
         self.perfil = self.perfil if isinstance(self.perfil,PefilProgramador) else None
         self.tiempo_ocioso = 0
         self.ultimo_tiempo_ocioso = 0
+        self.tiempos_comprometidos = [0 for i in range(self.programadores)]
 
-    def programadores_disponibles(self):
-        return self.programadores-self.programadores_ocupados
+    def programadores_disponibles(self,tiempo):
+        return len(list(filter(lambda tc: tc<tiempo,self.tiempos_comprometidos)))
+
+    @property
+    def menor_tiempo_comprometido(self):
+        return min(self.tiempos_comprometidos)
 
     def actualizar_tiempo_ocioso(self, tiempo):
         if tiempo<self.ultimo_tiempo_ocioso:
             return
 
         self.tiempo_ocioso += (tiempo-self.ultimo_tiempo_ocioso) * \
-            self.programadores_disponibles()
+            self.programadores_disponibles(tiempo)
         self.ultimo_tiempo_ocioso = tiempo
 
     def alguien_puede_resolver(self, tarea: Tarea) -> bool:
@@ -31,15 +34,16 @@ class Administrador:
         return configuracion.tiempo_de_resolucion(self.perfil.value, tarea.tipo_tarea.value)
 
     def resolver_tarea(self, tiempo_actual, tarea)->Tarea:
-        self.programadores_ocupados += 1
         tarea.perfil=self.perfil
-        tarea.tiempo_fin = tiempo_actual + \
-            self.tiempo_resolucion_tarea(tarea)
+        tarea.tiempo_fin = tiempo_actual + self.tiempo_resolucion_tarea(tarea)
+
+        self.tiempos_comprometidos.sort()
+
+        self.tiempos_comprometidos.pop(0)
+
+        self.tiempos_comprometidos = [tarea.tiempo_fin] + self.tiempos_comprometidos
+
         return tarea
-
-    def finalizar_tarea(self, tarea: Tarea):
-        self.programadores_ocupados -= 1
-
 
 class AdministradorJuniors(Administrador):
     def __init__(self, nro_programadores):
@@ -47,7 +51,7 @@ class AdministradorJuniors(Administrador):
         Administrador.__init__(self, nro_programadores)
 
     def alguien_puede_resolver(self, tarea: Tarea) -> bool:
-        return self.programadores_disponibles() > 0 and tarea.tipo_tarea in [TipoTarea.Facil, TipoTarea.Normal]
+        return tarea.tipo_tarea in [TipoTarea.Facil, TipoTarea.Normal]
 
 
 class AdministradorSemiseniors(Administrador):
@@ -56,7 +60,7 @@ class AdministradorSemiseniors(Administrador):
         Administrador.__init__(self, nro_programadores)
 
     def alguien_puede_resolver(self, tarea: Tarea) -> bool:
-        return self.programadores_disponibles() > 0 and tarea.tipo_tarea != TipoTarea.Imposible
+        return tarea.tipo_tarea != TipoTarea.Imposible
 
 
 class AdministradorSeniors(Administrador):
@@ -65,7 +69,7 @@ class AdministradorSeniors(Administrador):
         Administrador.__init__(self, nro_programadores)
 
     def alguien_puede_resolver(self, tarea: Tarea) -> bool:
-        return self.programadores_disponibles() > 0
+        return True
 
 
 def crear_administrador(perfil: PefilProgramador, cantidad_programadores):

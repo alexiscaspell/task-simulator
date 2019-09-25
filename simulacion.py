@@ -94,18 +94,18 @@ class Simulacion:
         while len(lista_tareas) > 0:
             tarea = lista_tareas.pop(0)
 
-            se_puede_resolver = False
+            posibles_resolutores = []
 
             for admin in self.administradores:
                 if admin.alguien_puede_resolver(tarea):
-                    tarea_actualizada = admin.resolver_tarea(self.tiempo_sistema,tarea)
-                    tareas_asignadas.append(tarea_actualizada)
-                    se_puede_resolver=True
-                    break
-            if not se_puede_resolver:    
-                tareas_sin_asignar.append(tarea)
+                    posibles_resolutores.append(admin)
 
-
+            ordenamiento = lambda a : a.menor_tiempo_comprometido
+            posibles_resolutores.sort(key=ordenamiento)
+            admin = posibles_resolutores[0]
+            tarea_actualizada = admin.resolver_tarea(self.tiempo_sistema,tarea)
+            tareas_asignadas.append(tarea_actualizada)
+            
         return tareas_asignadas,tareas_sin_asignar
 
     def resolver(self,evento:Evento):
@@ -127,8 +127,8 @@ class Simulacion:
 
         elif isinstance(evento,EventoSalida):
             print(f"SALIDA DE {evento.tarea.perfil.value} ...")
-            admin = next(a for a in self.administradores if a.perfil==evento.tarea.perfil)
-            admin.finalizar_tarea(evento.tarea)
+            # admin = next(a for a in self.administradores if a.perfil==evento.tarea.perfil)
+            # admin.finalizar_tarea(evento.tarea)
             self.tareas_finalizadas.append(evento.tarea)
 
         return llegadas+salidas
@@ -154,7 +154,7 @@ class TiempoOcioso:
         return self.resultado
 
     def generar_grafico(self):
-        tiempos_ocio = self.resultado.values()
+        tiempos_ocio = [v*100 for v in self.resultado.values()]
         x = np.arange(len(self.resultado))
         plt.bar(x, tiempos_ocio)
         plt.xticks(x, tuple([k for k in self.resultado]))
@@ -197,11 +197,7 @@ class PorcentajeDeTareasRealizadas:
         Metrica.__init__(self,data)
 
     def calcular(self, simulacion: Simulacion):
-        H = len(simulacion.tareas_finalizadas)
-        L = len(simulacion.tareas)
-        total = max(1, H+L)
-
-        self.resultado =  H/total
+        self.resultado =  len(simulacion.tareas_finalizadas)/len(simulacion.tareas)
 
         return self.resultado
 
