@@ -2,7 +2,7 @@ import datetime
 import json
 import time
 
-# import dateutil.parser
+import dateutil.parser
 import matplotlib.pyplot as plt
 import numpy as np
 import pylab
@@ -12,11 +12,14 @@ from fitter import Fitter
 from numpy.polynomial.polynomial import Polynomial
 from scipy.optimize import curve_fit
 
-FECHA_INICIAL_SIMULACION = datetime.datetime(2018, 1, 1)
+
 
 #################################################################
 # PARAMETROS
 #################################################################
+
+FECHA_INICIAL_INICIAL = datetime.datetime(2018, 1, 1)
+FECHA_FINAL_TAREAS = datetime.datetime(2019,4,30)
 
 RUTA_DATOS = "datos/tareas.json"
 
@@ -32,17 +35,15 @@ datos = json.load(archivo)
 # CONVERSORES
 #################################################################
 def string_a_fecha(fecha_en_string):
-    # return dateutil.parser.parse(fecha_en_string)
-    return datetime.datetime.strptime(fecha_en_string,"%Y-%m-%d %H:%M:%S.%f")
+    return dateutil.parser.parse(fecha_en_string)
 
 
 def fecha_string_a_tiempo_simulacion(fecha_en_string):
     fecha = string_a_fecha(fecha_en_string)
 
-    d1_ts = time.mktime(FECHA_INICIAL_SIMULACION.timetuple())
-    d2_ts = time.mktime(fecha.timetuple())
+    milisegundos = fecha.timestamp() - FECHA_INICIAL_INICIAL.timestamp()
+    return int(milisegundos / 100 )
 
-    return int(d2_ts-d1_ts)
 
 
 #################################################################
@@ -80,8 +81,7 @@ def obtener_intervalos_tiempos_llegada():
 # TA por tipos
 def obtener_tiempos_resolucion(tipo_perfil):
     return [
-        fecha_string_a_tiempo_simulacion(
-            tarea['fecha_fin']) - fecha_string_a_tiempo_simulacion(tarea['fecha_inicio'])
+        fecha_string_a_tiempo_simulacion(tarea['fecha_fin']) - fecha_string_a_tiempo_simulacion(tarea['fecha_inicio'])
         for tarea in datos
         if tarea['perfil'] == tipo_perfil
     ]
@@ -191,8 +191,8 @@ if __name__ == "__main__":
     # ver_tiempos_salidas(SENIOR)
 
     # APROXIMACIONES
-    generar_funcion_aproximada_llegadas(True)
+    generar_funcion_aproximada_llegadas()
 
-    # generar_funcion_aproximada_salidas(JUNIOR)
-    # generar_funcion_aproximada_salidas(SEMISENIOR)
-    # generar_funcion_aproximada_salidas(SENIOR)
+    generar_funcion_aproximada_salidas(JUNIOR)
+    generar_funcion_aproximada_salidas(SEMISENIOR)
+    generar_funcion_aproximada_salidas(SENIOR)
