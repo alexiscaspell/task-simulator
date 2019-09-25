@@ -46,8 +46,14 @@ class Tarea:
         perfil=tarea_spec.get('perfil',None)
         self.perfil = PefilProgramador(perfil) if perfil is  not None else None
         self.tiempo_creacion = tarea_spec['tiempo_creacion'] if "tiempo_creacion" in tarea_spec else fecha_string_a_tiempo_simulacion(tarea_spec["fecha_creacion"])
-        self.tiempo_inicio = tarea_spec.get('tiempo_inicio',None)
-        self.tiempo_fin = tarea_spec.get('tiempo_fin',None)
+
+        tiempo_inicio = tarea_spec.get('tiempo_inicio',None)
+        tiempo_inicio = tiempo_inicio if tiempo_inicio is not None and "fecha_inicio" in tarea_spec else fecha_string_a_tiempo_simulacion(tarea_spec["fecha_inicio"])
+        self.tiempo_inicio =  tiempo_inicio
+
+        tiempo_fin = tarea_spec.get('tiempo_fin',None)
+        tiempo_fin = tiempo_fin if tiempo_fin is not None and "fecha_fin" in tarea_spec else fecha_string_a_tiempo_simulacion(tarea_spec["fecha_fin"])
+        self.tiempo_fin =  tiempo_fin
 
     def get_dict(self):
         return {'tipo': None if self.tipo_tarea is None else self.tipo_tarea.value,

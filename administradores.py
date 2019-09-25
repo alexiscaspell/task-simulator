@@ -35,7 +35,8 @@ class Administrador:
 
     def resolver_tarea(self, tiempo_actual, tarea)->Tarea:
         tarea.perfil=self.perfil
-        tarea.tiempo_fin = tiempo_actual + self.tiempo_resolucion_tarea(tarea)
+        tiempo_resolucion = self.tiempo_resolucion_tarea(tarea) if tarea.tiempo_fin is None else tarea.tiempo_fin-tarea.tiempo_inicio
+        tarea.tiempo_fin = tiempo_actual + tiempo_resolucion
 
         self.tiempos_comprometidos.sort()
 

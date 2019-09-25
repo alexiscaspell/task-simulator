@@ -1,5 +1,5 @@
 from typing import List,Tuple
-from simulacion import Simulacion,Metrica,crear_eventos_llegada,Evento
+from simulacion import Simulacion,Metrica,crear_eventos_llegada,Evento,crear_eventos_salida
 from tareas import Tarea,tareas_random,string_a_fecha
 import bisect
 import configuracion
