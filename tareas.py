@@ -47,15 +47,24 @@ class Tarea:
         self.tipo_tarea = TipoTarea(tarea_spec['tipo'])
         perfil=tarea_spec.get('perfil',None)
         self.perfil = PefilProgramador(perfil) if perfil is  not None else None
-        self.tiempo_creacion = tarea_spec['tiempo_creacion'] if "tiempo_creacion" in tarea_spec else fecha_string_a_tiempo_simulacion(tarea_spec["fecha_creacion"])
+
+        tiempo_creacion = tarea_spec.get('tiempo_creacion',None)
+        if tiempo_creacion is None:
+            tiempo_creacion = fecha_string_a_tiempo_simulacion(tarea_spec["fecha_creacion"]) if "fecha_creacion" in tarea_spec else None
+            
+        self.tiempo_creacion = tiempo_creacion
 
         tiempo_inicio = tarea_spec.get('tiempo_inicio',None)
-        tiempo_inicio = tiempo_inicio if tiempo_inicio is not None and "fecha_inicio" in tarea_spec else fecha_string_a_tiempo_simulacion(tarea_spec["fecha_inicio"])
-        self.tiempo_inicio =  tiempo_inicio
+        if tiempo_inicio is None:
+            tiempo_inicio = fecha_string_a_tiempo_simulacion(tarea_spec["fecha_inicio"]) if "fecha_inicio" in tarea_spec else None
+
+        self.tiempo_inicio = tiempo_inicio
 
         tiempo_fin = tarea_spec.get('tiempo_fin',None)
-        tiempo_fin = tiempo_fin if tiempo_fin is not None and "fecha_fin" in tarea_spec else fecha_string_a_tiempo_simulacion(tarea_spec["fecha_fin"])
-        self.tiempo_fin =  tiempo_fin
+        if tiempo_fin is None:
+            tiempo_fin = fecha_string_a_tiempo_simulacion(tarea_spec["fecha_fin"]) if "fecha_fin" in tarea_spec else None
+
+        self.tiempo_fin = tiempo_fin
 
     def get_dict(self):
         return {'tipo': None if self.tipo_tarea is None else self.tipo_tarea.value,
@@ -63,20 +72,26 @@ class Tarea:
                 'tiempo_creacion': self.tiempo_creacion,
                 'tiempo_inicio': self.tiempo_inicio,
                 'tiempo_fin': self.tiempo_fin,
-                'fecha_creacion': str(self.fecha_creacion()),
-                'fecha_inicio': str(self.fecha_inicio()),
-                'fecha_fin': str(self.fecha_fin())
+                'fecha_creacion': str(self.fecha_creacion()) if self.fecha_creacion() is not None else None,
+                'fecha_inicio': str(self.fecha_inicio())  if self.fecha_inicio() is not None else None,
+                'fecha_fin': str(self.fecha_fin()) if self.fecha_fin() is not None else None
                 }
 
     def fecha_creacion(self):
+        if self.tiempo_creacion is None:
+            return None
         c = configuracion.configuracion()
         return c.calcular_fecha(c.fecha_inicial, self.tiempo_creacion)
 
     def fecha_inicio(self):
+        if self.tiempo_inicio is None:
+            return None
         c = configuracion.configuracion()
         return c.calcular_fecha(c.fecha_inicial, self.tiempo_inicio)
 
     def fecha_fin(self):
+        if self.tiempo_fin is None:
+            return None
         c = configuracion.configuracion()
         return c.calcular_fecha(c.fecha_inicial, self.tiempo_fin)
 

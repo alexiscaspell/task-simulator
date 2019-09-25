@@ -57,9 +57,9 @@ def simular(simulacion:Simulacion)->Tuple[Simulacion,List]:
     print("Comenzando simulacion ...")
 
     #SOLO SE SIMULA LO QUE ESTA DENTRO DEL RANGO DE TIEMPO
-    simulacion.lista_tareas = list(filter(lambda t:t.tiempo_creacion<simulacion.tiempo_fin,simulacion.tareas))
+    simulacion.tareas = list(filter(lambda t:t.tiempo_creacion<simulacion.tiempo_fin,simulacion.tareas))
 
-    eventos = crear_eventos_llegada(simulacion.lista_tareas)
+    eventos = crear_eventos_llegada(simulacion.tareas)
 
     procesados=0
     total=len(eventos)
@@ -89,6 +89,14 @@ def simular(simulacion:Simulacion)->Tuple[Simulacion,List]:
 
     print(f"TIEMPO FINAL: {simulacion.tiempo_sistema}")
     print(f"PROCESADOS {procesados} EVENTOS")
+
+    with open("realizadas.json","w+") as f:
+        json.dump([t.get_dict() for t in simulacion.tareas_finalizadas],f)
+    with open("sin_terminar.json","w+") as f:
+        json.dump([t.get_dict() for t in simulacion.tareas_asignadas],f)
+    with open("tareas.json","w+") as f:
+        json.dump([t.get_dict() for t in simulacion.tareas],f)
+
 
     return simulacion,simulacion.resultado_metricas()
 
