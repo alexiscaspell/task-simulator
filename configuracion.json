@@ -1,13 +1,14 @@
 {
-    "cantidad_juniors": 2,
-    "cantidad_semiseniors": 2,
-    "cantidad_seniors": 2,
-    "tiempo_fin_simulacion": 172800,
+    "cantidad_juniors": 1,
+    "cantidad_semiseniors": 10,
+    "cantidad_seniors": 10,
+    "tiempo_fin_simulacion": 8400,
     "logging": true,
-    "archivo_datos": "./datos/tareas.json",
-    "unidad_tiempo": "minutos",
+    "unidad_tiempo": "horas",
     "fecha_inicial": "01/01/18T09:00:00Z",
     "formato_fecha": "%d/%m/%yT%H:%M:%SZ",
+    "cargar_de_archivo":false,
+    "archivo_datos":"./datos/tareas.json",
     "tiempo_de_resolucion": {
         "funcion": "obtener_tiempo_resolucion",
         "modulo": "lobo_fdp/fdps.py",
@@ -24,13 +25,12 @@
         "dificil": 0.25,
         "imposible": 0.07
     },
-    "dias_laborales_mes": 22,
     "horas_laborales_dia": 9,
     "metricas": [
         {
             "nombre": "porcentaje_tareas_realizadas",
             "grafico":{
-                "activo":true,
+                "activo":false,
                 "nombre_archivo":"./graficos/tareas_realizadas",
                 "extension":"png"
             }
@@ -38,7 +38,7 @@
         {
             "nombre": "tiempo_ocioso",
             "grafico":{
-                "activo":true,
+                "activo":false,
                 "nombre_archivo":"./graficos/tiempo_ocioso",
                 "extension":"png"
             }
@@ -47,7 +47,7 @@
             "nombre": "tiempo_resolucion_promedio",
             "unidad_tiempo": "horas",
             "grafico":{
-                "activo":true,
+                "activo":false,
                 "nombre_archivo":"./graficos/tiempo_resolucion_promedio",
                 "extension":"png"
             }

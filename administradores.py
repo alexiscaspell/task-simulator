@@ -34,9 +34,17 @@ class Administrador:
         return configuracion.tiempo_de_resolucion(self.perfil.value, tarea.tipo_tarea.value)
 
     def resolver_tarea(self, tiempo_actual, tarea)->Tarea:
+
         tarea.perfil=self.perfil
+        
+        tarea.tiempo_inicio = max(self.menor_tiempo_comprometido,tiempo_actual) if tarea.tiempo_inicio is None else tarea.tiempo_inicio
+
         tiempo_resolucion = self.tiempo_resolucion_tarea(tarea) if tarea.tiempo_fin is None else tarea.tiempo_fin-tarea.tiempo_inicio
-        tarea.tiempo_fin = tiempo_actual + tiempo_resolucion
+
+        tarea.tiempo_fin = tarea.tiempo_inicio + tiempo_resolucion
+
+        if self.menor_tiempo_comprometido > tarea.tiempo_inicio:
+            raise ValueError("NEGRO, ME ESTAS ROBANDO CON LOS TIEMPOS...")
 
         self.tiempos_comprometidos.sort()
 
