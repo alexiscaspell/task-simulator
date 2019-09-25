@@ -5,6 +5,7 @@ from abc import ABCMeta
 from typing import List,Tuple
 from administradores import Administrador
 from tareas import Tarea
+from configuracion import UnidadTiempo
 
 class Metrica(ABCMeta):
     def __init__(self,metrica_spec):
@@ -142,6 +143,7 @@ class TiempoOcioso:
 class TiempoDeResolucionPromedio:
 
     def __init__(self,data):
+        self.unidad_tiempo=UnidadTiempo(data.get("unidad_tiempo",UnidadTiempo.Segundos))
         Metrica.__init__(self,data)
 
     def calcular(self, simulacion: Simulacion):
@@ -153,6 +155,7 @@ class TiempoDeResolucionPromedio:
             cant_tareas = max(len(tareas_de_tipo_tarea), 1)
                 
             promedio = sum(map(lambda t: t.tiempo_fin - t.tiempo_creacion, tareas_de_tipo_tarea))/cant_tareas
+            promedio = UnidadTiempo.Segundos.llevar_a(self.unidad_tiempo,promedio)
             tiempos_promedio_por_tipo_tarea.append(
                 {tipo_tarea.value: promedio})
 

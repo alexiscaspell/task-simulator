@@ -3,20 +3,19 @@
     "cantidad_semiseniors": 1,
     "cantidad_seniors": 1,
     "tiempo_fin_simulacion": 172800,
-    "archivo_datos":"./datos/tareas.json",
-    "logging":true,
+    "logging": true,
     "unidad_tiempo": "minutos",
     "fecha_inicial": "01/01/18T09:00:00Z",
     "formato_fecha": "%d/%m/%yT%H:%M:%SZ",
     "tiempo_de_resolucion": {
         "funcion": "obtener_tiempo_resolucion",
         "modulo": "lobo_fdp/fdps.py",
-        "unidad_tiempo":"minutos"
+        "unidad_tiempo": "minutos"
     },
     "intervalo_arribo_tareas": {
         "funcion": "obtener_intervalo_arribo",
         "modulo": "lobo_fdp/fdps.py",
-        "unidad_tiempo":"minutos"
+        "unidad_tiempo": "minutos"
     },
     "probabilidades_tareas": {
         "facil": 0.31,
@@ -26,5 +25,16 @@
     },
     "dias_laborales_mes": 20,
     "horas_laborales_dia": 8,
-    "metricas":[{"nombre":"porcentaje_tareas_realizadas"},{"nombre":"tiempo_ocioso"},{"nombre":"tiempo_resolucion_promedio"}]
+    "metricas": [
+        {
+            "nombre": "porcentaje_tareas_realizadas"
+        },
+        {
+            "nombre": "tiempo_ocioso"
+        },
+        {
+            "nombre": "tiempo_resolucion_promedio",
+            "unidad_tiempo": "horas"
+        }
+    ]
 }

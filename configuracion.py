@@ -20,6 +20,14 @@ class UnidadTiempo(Enum):
     Minutos = "minutos"
     Horas = "horas"
 
+    def llevar_a(self,unidad,un_tiempo):
+        if unidad == UnidadTiempo.Segundos:
+            return self.llevar_a_segundos(un_tiempo)
+        elif unidad == UnidadTiempo.Horas:
+            return self.llevar_a_horas(un_tiempo)
+        elif unidad == UnidadTiempo.Minutos:
+            return self.llevar_a_minutos(un_tiempo)
+
     def llevar_a_minutos(self, un_tiempo: int) -> int:
         if self == UnidadTiempo.Segundos:
             return un_tiempo/60
