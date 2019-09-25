@@ -102,7 +102,7 @@ class Simulacion:
 
             ordenamiento = lambda a : a.menor_tiempo_comprometido
             posibles_resolutores.sort(key=ordenamiento)
-            admin = posibles_resolutores[0]
+            admin = posibles_resolutores[0] if tarea.perfil is None else next(a for a in self.administradores if a.perfil==tarea.perfil)
             tarea_actualizada = admin.resolver_tarea(self.tiempo_sistema,tarea)
             tareas_asignadas.append(tarea_actualizada)
             
