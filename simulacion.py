@@ -7,6 +7,9 @@ from administradores import Administrador
 from tareas import Tarea
 
 class Metrica(ABCMeta):
+    def __init__(self,metrica_spec):
+        self.nombre = metrica_spec["nombre"]
+
     def calcular(self, simulacion):
         raise NotImplementedError(
             "Metodo a implementar por metrica no cumplido")
@@ -15,8 +18,13 @@ class FactoryMetricas:
 
     @staticmethod
     def crear(metric_spec: dict) -> Metrica:
-        raise NotImplementedError()
-
+        if metric_spec["nombre"]=="tiempo_ocioso":
+            return TiempoOcioso(metric_spec)
+        elif metric_spec["nombre"]=="tiempo_resolucion_promedio":
+            return TiempoDeResolucionPromedio(metric_spec)
+        elif metric_spec["nombre"]=="porcentaje_tareas_realizadas":
+            return PorcentajeDeTareasRealizadas(metric_spec)
+        
 ###########################################################--- SIMULACION ---###########################################################
 class Evento:
     def __init__(self,tarea):
@@ -108,47 +116,59 @@ class Simulacion:
         return llegadas+salidas
 
     def resultado_metricas(self):
-        return list(map(lambda m: m.calcular(self), self.metricas))
+        return list(map(lambda m: {m.nombre: m.calcular(self)}, self.metricas))
 
 ###########################################################--- METRICAS ---###########################################################
-class TiempoOcioso(Metrica):
+class TiempoOcioso:
 
-    def calcular(self):
-        return [{"perfil": e["perfil"].value, "porcentaje":e["tiempo_ocioso"]/(max(1, self.tiempo_finalizacion*e["cantidad_programadores"]))} for e in self.tiempos_de_ocio]
+    def __init__(self,data):
+        Metrica.__init__(self,data)
 
-    def agregar_tiempo_ocioso(self, perfil, cantidad_personas_al_pedo):
-        mapa_de_ocio = next(
-            mapa for mapa in self.tiempos_de_ocio if mapa["perfil"] == perfil)
-        mapa_de_ocio.update(
-            {"tiempo_ocioso": mapa_de_ocio["tiempo_ocioso"]+cantidad_personas_al_pedo})
+    def calcular(self, simulacion: Simulacion):
+        resultado = {}
+        for a in simulacion.administradores:
+            perfil = a.perfil
+            porcentaje_ocioso = a.tiempo_ocioso/(simulacion.tiempo_fin*a.programadores)
+            resultado.update({perfil.value:porcentaje_ocioso})
 
+        self.resultado=resultado
 
-class TiempoDeResolucionPromedio(Metrica):
+        return self.resultado
+
+class TiempoDeResolucionPromedio:
+
+    def __init__(self,data):
+        Metrica.__init__(self,data)
 
     def calcular(self, simulacion: Simulacion):
         tiempos_promedio_por_tipo_tarea = []
 
         for tipo_tarea in TipoTarea:
             tareas_de_tipo_tarea = list(
-                filter(lambda t: t.tipo_tarea == tipo_tarea, simulacion.tareas_realizadas))
+                filter(lambda t: t.tipo_tarea == tipo_tarea, simulacion.tareas_finalizadas))
             cant_tareas = max(len(tareas_de_tipo_tarea), 1)
             promedio = sum(map(lambda t: t.fecha_fin -
                                t.fecha_creacion, tareas_de_tipo_tarea))/cant_tareas
             tiempos_promedio_por_tipo_tarea.append(
                 {tipo_tarea.value: promedio})
 
-        return tiempos_promedio_por_tipo_tarea
+        self.resultado = tiempos_promedio_por_tipo_tarea
 
+        return self.resultado
 
-class PorcentajeDeTareasRealizadas(Metrica):
+class PorcentajeDeTareasRealizadas:
+    
+    def __init__(self,data):
+        Metrica.__init__(self,data)
 
     def calcular(self, simulacion: Simulacion):
-        H = len(simulacion.tareas_realizadas)
+        H = len(simulacion.tareas_finalizadas)
         L = len(simulacion.tareas)
         total = max(1, H+L)
 
-        return H/total
+        self.resultado =  H/total
 
+        return self.resultado
 
 if __name__ == "__main__":
     pass

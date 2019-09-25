@@ -31,29 +31,38 @@ def realizar_simulacion(tareas_file_path:str=None)->List[Metrica]:
     return simular(data)
 
 def insertar_eventos(eventos:List[Evento],mas_eventos:List[Evento]):
+    if len(eventos)>0:
+        mas_eventos = [eventos.pop(0)]+mas_eventos
 
-    for e in mas_eventos:
-        tiempos_eventos = list(map(lambda ev: ev.tiempo, eventos))
+    return mas_eventos+eventos
 
-        desplazamiento = bisect.bisect_right(tiempos_eventos, e.tiempo)
-        # resto = len(eventos) - desplazamiento
+# def insertar_eventos(eventos:List[Evento],mas_eventos:List[Evento]):
 
-        # eventos = eventos[desplazamiento:]+[e]+eventos[:resto]
-        eventos.insert(desplazamiento,e)
+#     for e in mas_eventos:
+#         tiempos_eventos = list(map(lambda ev: ev.tiempo, eventos))
 
-    return eventos
+#         desplazamiento = bisect.bisect_right(tiempos_eventos, e.tiempo)
+#         # resto = len(eventos) - desplazamiento
+
+#         # eventos = eventos[desplazamiento:]+[e]+eventos[:resto]
+#         eventos.insert(desplazamiento,e)
+
+#     return eventos
         
 
 def simular(simulacion:Simulacion)->List[Metrica]:
 
     print("Comenzando simulacion ...")
 
-    eventos = crear_eventos_llegada(simulacion.tareas)
+    simulacion.lista_tareas = list(filter(lambda t:t.tiempo_creacion<simulacion.tiempo_fin,simulacion.tareas))
+
+    eventos = crear_eventos_llegada(simulacion.lista_tareas)
 
     procesados=0
     total=len(eventos)
 
-    while(simulacion.tiempo_sistema<simulacion.tiempo_fin):
+    # while(simulacion.tiempo_sistema<simulacion.tiempo_fin):
+    while(len(eventos)>0):
 
         procesados +=1
 
