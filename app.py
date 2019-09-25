@@ -72,7 +72,7 @@ def simular(simulacion:Simulacion)->Tuple[Simulacion,List]:
         evento = eventos.pop(0) if len(eventos)>0 else None
 
         if evento is None:
-            continue
+            break
 
         simulacion.tiempo_sistema = evento.tiempo
 

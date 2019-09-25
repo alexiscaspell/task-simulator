@@ -1,9 +1,10 @@
 {
-    "cantidad_juniors": 10,
-    "cantidad_semiseniors": 1,
-    "cantidad_seniors": 1,
+    "cantidad_juniors": 2,
+    "cantidad_semiseniors": 2,
+    "cantidad_seniors": 2,
     "tiempo_fin_simulacion": 172800,
     "logging": true,
+    "archivo_datos": "./datos/tareas.json",
     "unidad_tiempo": "minutos",
     "fecha_inicial": "01/01/18T09:00:00Z",
     "formato_fecha": "%d/%m/%yT%H:%M:%SZ",

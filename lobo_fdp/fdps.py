@@ -7,7 +7,7 @@ import numpy as np
 #################################
 
 # TPLL
-lista_parametros = [8253.345782113991, -476.8917473181026]
+lista_parametros = [544365.886143626, -42223.051395900664]
 a = lista_parametros[0]
 b = lista_parametros[1]
 

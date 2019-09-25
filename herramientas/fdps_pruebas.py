@@ -42,7 +42,7 @@ def fecha_string_a_tiempo_simulacion(fecha_en_string):
     d1_ts = time.mktime(FECHA_INICIAL_SIMULACION.timetuple())
     d2_ts = time.mktime(fecha.timetuple())
 
-    return int(int(d2_ts-d1_ts) / 60)
+    return int(d2_ts-d1_ts)
 
 
 #################################################################
@@ -92,14 +92,9 @@ def obtener_tiempos_resolucion(tipo_perfil):
 #################################################################
 
 def ver_intervalos_tiempos_llegadas():
-    tiempos = obtener_tiempos_llegada()
-    tiempos.sort()
-
-    tiempos_2 = [0] + tiempos[:-1]
-    tiempos_2.sort()
-
-    y = [x1 - x2 for (x1, x2) in zip(tiempos, tiempos_2)]
+    y = obtener_intervalos_tiempos_llegada()
     y.sort()
+    print(y)
 
     x = np.linspace(1, len(y), num=len(y))
 
@@ -196,8 +191,8 @@ if __name__ == "__main__":
     # ver_tiempos_salidas(SENIOR)
 
     # APROXIMACIONES
-    generar_funcion_aproximada_llegadas()
+    generar_funcion_aproximada_llegadas(True)
 
-    generar_funcion_aproximada_salidas(JUNIOR)
-    generar_funcion_aproximada_salidas(SEMISENIOR)
-    generar_funcion_aproximada_salidas(SENIOR)
+    # generar_funcion_aproximada_salidas(JUNIOR)
+    # generar_funcion_aproximada_salidas(SEMISENIOR)
+    # generar_funcion_aproximada_salidas(SENIOR)
