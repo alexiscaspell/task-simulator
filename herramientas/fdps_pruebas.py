@@ -2,7 +2,7 @@ import datetime
 import time
 import json
 
-import dateutil.parser
+# import dateutil.parser
 import matplotlib.pyplot as plt
 import numpy as np
 import pylab
@@ -18,17 +18,22 @@ FECHA_INICIAL_SIMULACION = datetime.datetime(2018, 1, 1)
 # PARAMETROS
 #################################################################
 
-RUTA_DATOS = "../datos/tareas.json"
+RUTA_DATOS = "datos/tareas.json"
 
-with open(RUTA_DATOS) as archivo:
-    datos = json.load(archivo)
+try:
+     archivo = open(RUTA_DATOS)
+except Exception:
+    archivo = open("../"+RUTA_DATOS)
+    pass
+datos = json.load(archivo)
 
 
 #################################################################
 # CONVERSORES
 #################################################################
 def string_a_fecha(fecha_en_string):
-    return dateutil.parser.parse(fecha_en_string)
+    # return dateutil.parser.parse(fecha_en_string)
+    return datetime.datetime.strptime(fecha_en_string,"%Y-%m-%d %H:%M:%S.%f")
 
 
 def fecha_string_a_tiempo_simulacion(fecha_en_string):
