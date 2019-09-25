@@ -7,14 +7,12 @@ import numpy as np
 #################################
 
 # TPLL
-cte_weibull = 1.2732
+a = 1936.2424
+b = -92.27092485
+def funcion_exponencial(x):
+    return (a**x) - b
 
-
-def weibull(x):
-    return cte_weibull * x ** (-cte_weibull - 1) * math.exp(-x**-cte_weibull)
-
-
-fdp_tiempo_llegada = weibull
+fdp_tiempo_llegada = funcion_exponencial
 
 
 # TPSjunior
@@ -53,11 +51,11 @@ def metodo_del_rechazo(a: int, b: int, h: int, funcion) -> int:
             return int(x)
 
 
-def obtener_intervalo_arribo(tipo_tarea:str) -> int:
-    return metodo_del_rechazo(a=0, b=250, h=1, funcion=fdp_tiempo_llegada)
+def obtener_intervalo_arribo(tipo_tarea: str = "") -> int:
+    return int(fdp_tiempo_llegada(random.random()))
 
 
-def obtener_tiempo_resolucion(perfil: str, tipo_tarea: str)->int:
+def obtener_tiempo_resolucion(perfil: str, tipo_tarea: str) -> int:
     if perfil == "junior":
         return obtener_tiempo_resolucion_junior()
     elif perfil == "semisenior":
