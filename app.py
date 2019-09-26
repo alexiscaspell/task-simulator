@@ -32,11 +32,6 @@ def realizar_simulacion(tareas_file_path:str=None)->Tuple[Simulacion,List]:
 
     return simular(data)
 
-# def insertar_eventos(eventos:List[Evento],mas_eventos:List[Evento]):
-#     if len(eventos)>0:
-#         mas_eventos = [eventos.pop(0)]+mas_eventos
-
-#     return mas_eventos+eventos
 
 def insertar_eventos(eventos:List[Evento],mas_eventos:List[Evento]):
 
@@ -44,9 +39,7 @@ def insertar_eventos(eventos:List[Evento],mas_eventos:List[Evento]):
         tiempos_eventos = list(map(lambda ev: ev.tiempo, eventos))
 
         desplazamiento = bisect.bisect_right(tiempos_eventos, e.tiempo)
-        # resto = len(eventos) - desplazamiento
 
-        # eventos = eventos[desplazamiento:]+[e]+eventos[:resto]
         eventos.insert(desplazamiento,e)
 
     return eventos
@@ -65,7 +58,6 @@ def simular(simulacion:Simulacion)->Tuple[Simulacion,List]:
     total=len(eventos)
 
     while(simulacion.tiempo_sistema<simulacion.tiempo_fin):
-    # while(len(eventos)>0):
 
         procesados +=1
 
@@ -78,10 +70,6 @@ def simular(simulacion:Simulacion)->Tuple[Simulacion,List]:
 
         nuevos_eventos = simulacion.resolver(evento)
 
-        #SE DESCARTAN LOS EVENTOS CON t>=tiempo_fin
-        # nuevos_eventos_filtrados = list(filter(lambda e:e.tiempo<simulacion.tiempo_fin,nuevos_eventos))
-
-        # eventos = insertar_eventos(eventos,nuevos_eventos_filtrados)
         eventos = insertar_eventos(eventos,nuevos_eventos)
 
         if procesados%ceil(0.1*total)==0:
@@ -90,12 +78,12 @@ def simular(simulacion:Simulacion)->Tuple[Simulacion,List]:
     print(f"TIEMPO FINAL: {simulacion.tiempo_sistema}")
     print(f"PROCESADOS {procesados} EVENTOS")
 
-    with open("realizadas.json","w+") as f:
-        json.dump([t.get_dict() for t in simulacion.tareas_finalizadas],f)
-    with open("sin_terminar.json","w+") as f:
-        json.dump([t.get_dict() for t in simulacion.tareas_asignadas],f)
-    with open("tareas.json","w+") as f:
-        json.dump([t.get_dict() for t in simulacion.tareas],f)
+    # with open("realizadas.json","w+") as f:
+    #     json.dump([t.get_dict() for t in simulacion.tareas_finalizadas],f)
+    # with open("sin_terminar.json","w+") as f:
+    #     json.dump([t.get_dict() for t in simulacion.tareas_asignadas],f)
+    # with open("tareas.json","w+") as f:
+    #     json.dump([t.get_dict() for t in simulacion.tareas],f)
 
 
     return simulacion,simulacion.resultado_metricas()
