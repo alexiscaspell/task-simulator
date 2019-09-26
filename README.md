@@ -12,7 +12,7 @@ Clonar el proyecto de git o descargar en archivo .zip/.tar.gz y descomprimir
 
 * Python 3.6.8 o superior
 
-##Configuracion
+## Configuracion
 
 En la carpeta **./config** se encuentran los archivos en los cuales se puede configurar tanto las fdps como las variables de control,unidades de trabajo,metricas,etc.
 
