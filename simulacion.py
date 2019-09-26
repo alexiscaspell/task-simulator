@@ -5,7 +5,7 @@ from abc import ABCMeta
 from typing import List, Tuple
 from administradores import Administrador
 from tareas import Tarea
-from configuracion import UnidadTiempo
+from configuracion import UnidadTiempo,print
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -174,14 +174,14 @@ class TiempoOcioso:
 
         tuplas = list(self.resultado.items())
 
-        tuplas.sort(key=lambda e: e[1])
+        # tuplas.sort(key=lambda e: e[1])
 
         porcentajes = [float(f"{r[1]*100:3.2f}") for r in tuplas]
         perfiles = [t[0] for t in tuplas]
 
         x_pos = [i for i, _ in enumerate(perfiles)]
 
-        plt.bar(x_pos, porcentajes, color='green')
+        plt.bar(x_pos, porcentajes, color='green',edgecolor ='black')
         plt.xlabel("Perfil")
         plt.ylabel(f"Porcentaje (%)")
         plt.title("PORCENTAJE DE TIEMPO OCIOSO")
@@ -223,14 +223,14 @@ class TiempoDeResolucionPromedio:
 
         tuplas = list(self.resultado.items())
 
-        tuplas.sort(key=lambda e: e[1])
+        # tuplas.sort(key=lambda e: e[1])
 
         tiempos_promedio = [float(f"{r[1]:9.2f}") for r in tuplas]
         tipos_tarea = [t[0] for t in tuplas]
 
         x_pos = [i for i, _ in enumerate(tipos_tarea)]
 
-        plt.bar(x_pos, tiempos_promedio, color='green')
+        plt.bar(x_pos, tiempos_promedio, color='green',edgecolor ='black')
         plt.xlabel("Tarea")
         plt.ylabel(f"Tiempo ({self.unidad_tiempo.value})")
         plt.title("PROMEDIO DE RESOLUCION DE TAREAS")
@@ -255,7 +255,7 @@ class PorcentajeDeTareasRealizadas:
 
     def generar_grafico(self):
 
-        fig, ax = plt.subplots(subplot_kw=dict(aspect="equal"))
+        _, ax = plt.subplots(subplot_kw=dict(aspect="equal"))
 
         etiquetas = ['Hechas', 'Restantes']
         porcentajes = [self.resultado, 1-self.resultado]
@@ -263,8 +263,11 @@ class PorcentajeDeTareasRealizadas:
         def func(pct, allvals):
             return f"{pct:3.2f}%"
 
-        wedges, texts, autotexts = ax.pie(porcentajes, autopct=lambda pct: func(pct, porcentajes),
-                                          textprops=dict(color="w"))
+        explode = (0.1, 0) 
+        wedges, _, _ = ax.pie(porcentajes,explode=explode ,autopct=lambda pct: func(pct, porcentajes),
+                                          textprops=dict(color="w"),shadow=True,startangle=45,wedgeprops={"edgecolor": "0", 'linewidth': 1})
+        # wedges, _, _ = ax.pie(porcentajes,explode=explode ,autopct=lambda pct: func(pct, porcentajes),
+        #                                   textprops=dict(color="w"),wedgeprops={"edgecolor": "0", 'linewidth': 1})
 
         ax.legend(wedges, etiquetas,
                   title="Tareas",

@@ -6,7 +6,7 @@ import json
 import bisect
 from numpy.random import choice
 from typing import Dict
-from configuracion import UnidadTiempo
+from configuracion import UnidadTiempo,print
 from datetime import datetime
 import time
 from math import ceil

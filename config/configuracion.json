@@ -1,0 +1,56 @@
+{
+    "cantidad_juniors": 1,
+    "cantidad_semiseniors": 1,
+    "cantidad_seniors": 1,
+    "tiempo_fin_simulacion": 8400,
+    "logging": false,
+    "unidad_tiempo": "horas",
+    "fecha_inicial": "01/01/18T09:00:00Z",
+    "formato_fecha": "%d/%m/%yT%H:%M:%SZ",
+    "cargar_de_archivo":false,
+    "archivo_datos":"./datos/tareas.json",
+    "tiempo_de_resolucion": {
+        "funcion": "obtener_tiempo_resolucion",
+        "modulo": "funciones_probabilidad/fdps.py",
+        "unidad_tiempo": "minutos"
+    },
+    "intervalo_arribo_tareas": {
+        "funcion": "obtener_intervalo_arribo",
+        "modulo": "funciones_probabilidad/fdps.py",
+        "unidad_tiempo": "minutos"
+    },
+    "probabilidades_tareas": {
+        "facil": 0.31,
+        "normal": 0.37,
+        "dificil": 0.25,
+        "imposible": 0.07
+    },
+    "horas_laborales_dia": 9,
+    "metricas": [
+        {
+            "nombre": "porcentaje_tareas_realizadas",
+            "grafico":{
+                "activo":true,
+                "nombre_archivo":"./graficos/tareas_realizadas",
+                "extension":"pdf"
+            }
+        },
+        {
+            "nombre": "tiempo_ocioso",
+            "grafico":{
+                "activo":true,
+                "nombre_archivo":"./graficos/tiempo_ocioso",
+                "extension":"pdf"
+            }
+        },
+        {
+            "nombre": "tiempo_resolucion_promedio",
+            "unidad_tiempo": "minutos",
+            "grafico":{
+                "activo":true,
+                "nombre_archivo":"./graficos/tiempo_resolucion_promedio",
+                "extension":"pdf"
+            }
+        }
+    ]
+}

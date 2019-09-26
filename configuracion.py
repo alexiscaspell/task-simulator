@@ -169,7 +169,7 @@ def obtener_configuracion_de_archivo(path) -> Configuracion:
     return Configuracion(json_data)
 
 
-config = obtener_configuracion_de_archivo("./configuracion.json")
+config = obtener_configuracion_de_archivo("./config/configuracion.json")
 
 
 def configuracion():

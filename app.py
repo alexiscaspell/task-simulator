@@ -8,6 +8,8 @@ import json
 from math import ceil
 from administradores import Administrador,crear_administrador,PefilProgramador
 import matplotlib.pyplot as plt
+from tqdm import tqdm_gui
+import time
 
 
 def cargar_tareas(path:str)->List[Tarea]:
@@ -43,14 +45,19 @@ def insertar_eventos(eventos:List[Evento],mas_eventos:List[Evento]):
         eventos.insert(desplazamiento,e)
 
     return eventos
-        
 
 def simular(simulacion:Simulacion)->Tuple[Simulacion,List]:
 
     print("Comenzando simulacion ...")
 
+
+
+    print(f"CANTIDAD DE TAREAS ANTES DE FILTRO: {len(simulacion.tareas)}",True)
+
     #SOLO SE SIMULA LO QUE ESTA DENTRO DEL RANGO DE TIEMPO
     simulacion.tareas = list(filter(lambda t:t.tiempo_creacion<simulacion.tiempo_fin,simulacion.tareas))
+
+    print(f"CANTIDAD DE TAREAS DESPUES DE FILTRO: {len(simulacion.tareas)}",True)
 
     eventos = crear_eventos_llegada(simulacion.tareas)
 
@@ -58,13 +65,15 @@ def simular(simulacion:Simulacion)->Tuple[Simulacion,List]:
     total=len(eventos)
 
     while(simulacion.tiempo_sistema<simulacion.tiempo_fin):
-
-        procesados +=1
+    # for _ in tqdm_gui(range(2*total)):
+    #     time.sleep(0.001)
 
         evento = eventos.pop(0) if len(eventos)>0 else None
 
         if evento is None:
             break
+
+        procesados +=1
 
         simulacion.tiempo_sistema = evento.tiempo
 
@@ -75,8 +84,8 @@ def simular(simulacion:Simulacion)->Tuple[Simulacion,List]:
         if procesados%ceil(0.1*total)==0:
             print(f"PROCESADOS {procesados} EVENTOS")
 
-    print(f"TIEMPO FINAL: {simulacion.tiempo_sistema}")
-    print(f"PROCESADOS {procesados} EVENTOS")
+    print(f"TIEMPO FINAL: {simulacion.tiempo_sistema}",True)
+    print(f"PROCESADOS {procesados} EVENTOS",True)
 
     # with open("realizadas.json","w+") as f:
     #     json.dump([t.get_dict() for t in simulacion.tareas_finalizadas],f)
