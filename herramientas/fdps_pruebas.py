@@ -22,6 +22,7 @@ FECHA_INICIAL_INICIAL = datetime.datetime(2018, 1, 1)
 FECHA_FINAL_TAREAS = datetime.datetime(2019,4,30)
 
 RUTA_DATOS = "datos/tareas.json"
+RUTA_CONFIG_SALIDA = "./config/fdp_config.json"
 
 try:
      archivo = open(RUTA_DATOS)
@@ -42,9 +43,13 @@ def fecha_string_a_tiempo_simulacion(fecha_en_string):
     fecha = string_a_fecha(fecha_en_string)
 
     milisegundos = fecha.timestamp() - FECHA_INICIAL_INICIAL.timestamp()
-    return int(milisegundos / 100 )
+    return int(milisegundos / (1000 * 60))
 
 
+def resta_fecha_strings_a_tiempo_simulacion(fecha_1, fecha_2):
+    resta = string_a_fecha(fecha_1) - string_a_fecha(fecha_2) 
+    return int(resta.total_seconds() / 60)
+    
 
 #################################################################
 # FUNCIONES
@@ -64,24 +69,10 @@ def obtener_tiempos_llegada():
     return [fecha_string_a_tiempo_simulacion(tarea['fecha_creacion']) for tarea in datos]
 
 
-# IA
-def obtener_intervalos_tiempos_llegada():
-    tiempos = obtener_tiempos_llegada()
-    tiempos.sort()
-
-    tiempos_2 = [0] + tiempos[:-1]
-    tiempos_2.sort()
-
-    y = [x1 - x2 for (x1, x2) in zip(tiempos, tiempos_2)]
-    y.sort()
-
-    return y
-
-
 # TA por tipos
 def obtener_tiempos_resolucion(tipo_perfil):
     return [
-        fecha_string_a_tiempo_simulacion(tarea['fecha_fin']) - fecha_string_a_tiempo_simulacion(tarea['fecha_inicio'])
+        resta_fecha_strings_a_tiempo_simulacion(tarea['fecha_fin'], tarea['fecha_inicio'])
         for tarea in datos
         if tarea['perfil'] == tipo_perfil
     ]
@@ -92,11 +83,11 @@ def obtener_tiempos_resolucion(tipo_perfil):
 #################################################################
 
 def ver_intervalos_tiempos_llegadas():
-    y = obtener_intervalos_tiempos_llegada()
+    y = obtener_tiempos_llegada()
     y.sort()
     print(y)
 
-    x = np.linspace(1, len(y), num=len(y))
+    x = np.linspace(0, 1, num=len(y))
 
     plt.plot(x, y, 'o')
     plt.legend(['puntos'], loc='best')
@@ -123,23 +114,26 @@ def generar_funcion_aproximada_llegadas(graficar = False):
     print(f"LLEGADAS\n")
 
     def funcion_aproximante(x, a, b):
-        return (a**x) - b
+        return a*x + b
 
-    y = obtener_intervalos_tiempos_llegada()
+    y = obtener_tiempos_llegada()
     y.sort()
     x = np.linspace(0, 1, num=len(y))
 
     param, param_cov = curve_fit(funcion_aproximante, x, y)
-    print(f'COEFICIENTES DE LA FUNCION: {[e for e in param]}\n')
+    coeficientes_resultado = [e for e in param]
+    print(f'COEFICIENTES DE LA FUNCION: \n{coeficientes_resultado}\n')
 
-    if not graficar: return
+    if graficar:
+        ans = param[0]*x + param[1]
 
-    ans = (param[0]**x) - param[1]
+        plt.plot(x, y, 'o', color='red', label="data")
+        plt.plot(x, ans, '--', color='blue', label="optimized data")
+        plt.legend()
+        plt.show()
 
-    plt.plot(x, y, 'o', color='red', label="data")
-    plt.plot(x, ans, '--', color='blue', label="optimized data")
-    plt.legend()
-    plt.show()
+    return coeficientes_resultado
+    
 
 
 def generar_funcion_aproximada_salidas(tipo_perfil, graficar = False):
@@ -165,16 +159,22 @@ def generar_funcion_aproximada_salidas(tipo_perfil, graficar = False):
 
     print(f"CANT. DATOS: {len(data)}")
     print(f"CANT. COORDENADAS: {len(coordenadas)}")
-    print(f"\n")
 
     polinomio = scipy.interpolate.lagrange(x[0:len(coordenadas)], y[0:len(coordenadas)])
-    print(f'POLINOMIO: \n{[e for e in Polynomial(polinomio).coef]}\n\n')
-    print(f'MAXIMO POSIBLE: {coordenadas[-1]}\n\n')
+    coeficientes_resultado = [e for e in Polynomial(polinomio).coef]
+    maximo_x_posible = coordenadas[-1][0]
+    maximo_y_posible = coordenadas[-1][1]
 
-    if not graficar: return
-    plt.plot(x, y, 'o', x, y, '-', x, polinomio(x), '--')
-    plt.legend(['puntos', 'interpolacion', 'polinomio'], loc='best')
-    plt.show()
+    print(f'POLINOMIO: \n{coeficientes_resultado}')
+    print(f'MAXIMO X POSIBLE: {maximo_x_posible}')
+    print(f'MAXIMO Y POSIBLE: {maximo_y_posible}\n\n')
+
+    if graficar:
+        plt.plot(x, y, 'o', x, y, '-', x, polinomio(x), '--')
+        plt.legend(['puntos', 'interpolacion', 'polinomio'], loc='best')
+        plt.show()
+
+    return coeficientes_resultado, maximo_x_posible, maximo_y_posible
 
 
 ###########################################################################################
@@ -184,15 +184,21 @@ def generar_funcion_aproximada_salidas(tipo_perfil, graficar = False):
 if __name__ == "__main__":
 
     # DATOS
-    # ver_intervalos_tiempos_llegadas()
+    # ver_intervalos_tiEMPOS_LLEGADAS()
 
     # ver_tiempos_salidas(JUNIOR)
     # ver_tiempos_salidas(SEMISENIOR)
     # ver_tiempos_salidas(SENIOR)
 
-    # APROXIMACIONES
-    generar_funcion_aproximada_llegadas()
+    # # APROXIMACIONES
 
-    generar_funcion_aproximada_salidas(JUNIOR)
-    generar_funcion_aproximada_salidas(SEMISENIOR)
-    generar_funcion_aproximada_salidas(SENIOR)
+    coeficientes = {}
+    coeficientes["llegadas"] = generar_funcion_aproximada_llegadas()
+
+    coeficientes["salidas_junior"], coeficientes["maximo_x_junior"], coeficientes["maximo_y_junior"] = generar_funcion_aproximada_salidas(JUNIOR)
+    coeficientes["salidas_semisenior"], coeficientes["maximo_x_semisenior"], coeficientes["maximo_y_semisenior"] = generar_funcion_aproximada_salidas(SEMISENIOR)
+    coeficientes["salidas_senior"], coeficientes["maximo_x_senior"], coeficientes["maximo_y_senior"] = generar_funcion_aproximada_salidas(SENIOR)
+
+    # GUARDADO
+    archivo_salida = open(RUTA_CONFIG_SALIDA,"w+")
+    archivo_salida.write(json.dumps(coeficientes))
