@@ -1,6 +1,6 @@
 ![alt text](logo.png)
 #
-Herramienta que busca simular la ejecucion de tareas dentro de un equipo de trabajo para luego tmar decisiones de negocio en base a metricas y resultados.
+Herramienta que busca simular la ejecucion de tareas dentro de un equipo de trabajo para luego tomar decisiones de negocio en base a metricas y resultados.
 
 
 ## Para empezar
