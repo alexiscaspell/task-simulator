@@ -82,6 +82,10 @@ class AdministradorSeniors(Administrador):
 
 
 def crear_administrador(perfil: PefilProgramador, cantidad_programadores):
+
+    if cantidad_programadores<0:
+        raise ValueError("NEGRO NO ME PODES ROBAR GENTE")
+    
     if perfil == PefilProgramador.Junior:
         return AdministradorJuniors(cantidad_programadores)
     elif perfil == PefilProgramador.Semisenior:

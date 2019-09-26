@@ -27,8 +27,14 @@ def realizar_simulacion(tareas_file_path:str=None)->Tuple[Simulacion,List]:
 
     if not lista_tareas:
         lista_tareas = tareas_random(configuracion.configuracion().tiempo_fin_simulacion)
+    
+    admin_junior = crear_administrador(PefilProgramador.Junior,configuracion.configuracion().cantidad_juniors)
+    admin_ssr = crear_administrador(PefilProgramador.Semisenior,configuracion.configuracion().cantidad_semiseniors)
+    admin_sr = crear_administrador(PefilProgramador.Senior,configuracion.configuracion().cantidad_seniors)
 
-    administradores = [crear_administrador(PefilProgramador.Junior,configuracion.configuracion().cantidad_juniors),crear_administrador(PefilProgramador.Semisenior,configuracion.configuracion().cantidad_semiseniors),crear_administrador(PefilProgramador.Senior,configuracion.configuracion().cantidad_seniors)]
+    administradores = [admin_junior,admin_ssr,admin_sr]
+
+    administradores = list(filter(lambda a:a.programadores>0,administradores))
 
     data = Simulacion(configuracion.configuracion(), lista_tareas,administradores)
 
@@ -100,7 +106,8 @@ def simular(simulacion:Simulacion)->Tuple[Simulacion,List]:
 if __name__ == "__main__":
     simulacion,resultados = realizar_simulacion(configuracion.configuracion().archivo_datos)
 
-    print(f"RESULTADOS: {resultados}")
+    # print(f"RESULTADOS: {resultados}")
+    print(f"RESULTADOS: {simulacion.resumen()}")
 
     for m in simulacion.metricas:
         m.generar_grafico()

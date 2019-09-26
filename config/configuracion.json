@@ -2,8 +2,8 @@
     "cantidad_juniors": 1,
     "cantidad_semiseniors": 1,
     "cantidad_seniors": 1,
-    "tiempo_fin_simulacion": 8400,
-    "logging": false,
+    "tiempo_fin_simulacion": 16800,
+    "logging": true,
     "unidad_tiempo": "horas",
     "fecha_inicial": "01/01/18T09:00:00Z",
     "formato_fecha": "%d/%m/%yT%H:%M:%SZ",
@@ -45,7 +45,7 @@
         },
         {
             "nombre": "tiempo_resolucion_promedio",
-            "unidad_tiempo": "minutos",
+            "unidad_tiempo": "horas",
             "grafico":{
                 "activo":true,
                 "nombre_archivo":"./graficos/tiempo_resolucion_promedio",

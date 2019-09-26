@@ -110,7 +110,7 @@ class Simulacion:
                 if admin.alguien_puede_resolver(tarea):
                     posibles_resolutores.append(admin)
 
-            def ordenamiento(a): return a.menor_tiempo_comprometido
+            ordenamiento = lambda a:a.menor_tiempo_comprometido
             posibles_resolutores.sort(key=ordenamiento)
 
             admin = posibles_resolutores[0] if tarea.perfil is None else next(
@@ -149,6 +149,16 @@ class Simulacion:
 
     def resultado_metricas(self):
         return list(map(lambda m: {m.nombre: m.calcular(self)}, self.metricas))
+
+    def resumen(self):
+        return {"tareas_generadas":len(self.tareas),
+                "tareas_resueltas": len(self.tareas_finalizadas),
+                "tareas_sin_resolver": len(self.tareas_asignadas),
+                "fecha_inicial": str(self.configuracion.fecha_inicial),
+                "fecha_fin": str(self.configuracion.calcular_fecha_fin()),
+                "metricas": self.resultado_metricas(),
+                "perfiles": {a.perfil.value:a.programadores for a in self.administradores}
+                }
 
 ###########################################################--- METRICAS ---###########################################################
 
