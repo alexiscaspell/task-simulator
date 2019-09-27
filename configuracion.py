@@ -37,41 +37,61 @@ def print(algo, logging=None):
     if logging or configuracion and config.logging:
         return builtins.print(algo)
 
+# HORAS_LABORALES = 9
+# DIAS_LABORALES = 20
+HORAS_LABORALES = 24
+DIAS_LABORALES = 31
 
 class UnidadTiempo(Enum):
     Segundos = "segundos"
     Minutos = "minutos"
     Horas = "horas"
+    Dias = "dias"
+    Meses = "meses"
+    Años = "años"
+
+    def orden_de_unidades(self):
+        return {
+            UnidadTiempo.Segundos:60,
+            UnidadTiempo.Minutos:60,
+            UnidadTiempo.Horas:HORAS_LABORALES,
+            UnidadTiempo.Dias:DIAS_LABORALES,
+            UnidadTiempo.Meses:12,
+            UnidadTiempo.Años:1
+        }
+
 
     def llevar_a(self,unidad,un_tiempo):
-        if unidad == UnidadTiempo.Segundos:
-            return self.llevar_a_segundos(un_tiempo)
-        elif unidad == UnidadTiempo.Horas:
-            return self.llevar_a_horas(un_tiempo)
-        elif unidad == UnidadTiempo.Minutos:
-            return self.llevar_a_minutos(un_tiempo)
+        if self==unidad:
+            return un_tiempo
+
+        unidades = list(self.orden_de_unidades().keys())
+        valores = list(self.orden_de_unidades().values())
+
+        indice_propio = unidades.index(self)
+        indice_unidad = unidades.index(unidad)
+
+        es_menor_unidad = indice_propio<indice_unidad
+
+        if es_menor_unidad:
+            lista = valores[indice_propio:indice_unidad]
+        else:
+            lista = valores[indice_unidad:indice_propio]
+
+        k = 1
+        for v in lista:
+            k = k*v 
+
+        return un_tiempo/k if es_menor_unidad else un_tiempo*k
 
     def llevar_a_minutos(self, un_tiempo: int) -> int:
-        if self == UnidadTiempo.Segundos:
-            return un_tiempo/60
-        elif self == UnidadTiempo.Horas:
-            return un_tiempo*60
-        return un_tiempo
+        return self.llevar_a(UnidadTiempo.Minutos,un_tiempo)
 
     def llevar_a_horas(self, un_tiempo: int) -> int:
-        if self == UnidadTiempo.Segundos:
-            return un_tiempo/(60*60)
-        elif self == UnidadTiempo.Minutos:
-            return un_tiempo/60
-        return un_tiempo
+        return self.llevar_a(UnidadTiempo.Horas,un_tiempo)
 
     def llevar_a_segundos(self, un_tiempo: int) -> int:
-        if self == UnidadTiempo.Minutos:
-            return un_tiempo*60
-        elif self == UnidadTiempo.Horas:
-            return un_tiempo*60*60
-        return un_tiempo
-
+        return self.llevar_a(UnidadTiempo.Segundos,un_tiempo)
 
 class ModuloExterno():
     def __init__(self, modulo_spec):
