@@ -87,7 +87,7 @@ def ver_intervalos_tiempos_llegadas():
     y.sort()
     print(y)
 
-    x = np.linspace(0, 1, num=len(y))
+    x = np.linspace(1, len(y), num=len(y))
 
     plt.plot(x, y, 'o')
     plt.legend(['puntos'], loc='best')
@@ -140,41 +140,26 @@ def generar_funcion_aproximada_salidas(tipo_perfil, graficar = False):
 
     print(f"SALIDAS DE PERFIL: {tipo_perfil}\n")
 
-    data = obtener_tiempos_resolucion(tipo_perfil)
-    data.sort()
+    def funcion_aproximante(x, a, b):
+        return a**x - b
 
-    y = []
-    x = []
-    coordenadas = []
-    for tiempo in set(data):
-        y = data.count(tiempo) / len(data)
-        x = tiempo
-        coordenadas.append((x, y))
+    y = obtener_tiempos_resolucion(tipo_perfil)
+    y.sort()
+    x = np.linspace(0, 1, num=len(y))
 
-    def f(e): return e[0]
-    coordenadas.sort(key=f)
-
-    x = list(map(f, coordenadas))
-    y = list(map(lambda e: e[1], coordenadas))
-
-    print(f"CANT. DATOS: {len(data)}")
-    print(f"CANT. COORDENADAS: {len(coordenadas)}")
-
-    polinomio = scipy.interpolate.lagrange(x[0:len(coordenadas)], y[0:len(coordenadas)])
-    coeficientes_resultado = [e for e in Polynomial(polinomio).coef]
-    maximo_x_posible = coordenadas[-1][0]
-    maximo_y_posible = coordenadas[-1][1]
-
-    print(f'POLINOMIO: \n{coeficientes_resultado}')
-    print(f'MAXIMO X POSIBLE: {maximo_x_posible}')
-    print(f'MAXIMO Y POSIBLE: {maximo_y_posible}\n\n')
+    param, param_cov = curve_fit(funcion_aproximante, x, y)
+    coeficientes_resultado = [e for e in param]
+    print(f'COEFICIENTES DE LA FUNCION: \n{coeficientes_resultado}\n')
 
     if graficar:
-        plt.plot(x, y, 'o', x, y, '-', x, polinomio(x), '--')
-        plt.legend(['puntos', 'interpolacion', 'polinomio'], loc='best')
+        ans = param[0]**x - param[1]
+
+        plt.plot(x, y, 'o', color='red', label="data")
+        plt.plot(x, ans, '--', color='blue', label="optimized data")
+        plt.legend()
         plt.show()
 
-    return coeficientes_resultado, maximo_x_posible, maximo_y_posible
+    return coeficientes_resultado
 
 
 ###########################################################################################
@@ -184,20 +169,20 @@ def generar_funcion_aproximada_salidas(tipo_perfil, graficar = False):
 if __name__ == "__main__":
 
     # DATOS
-    # ver_intervalos_tiEMPOS_LLEGADAS()
+    # ver_intervalos_tiempos_llegadas()
 
     # ver_tiempos_salidas(JUNIOR)
     # ver_tiempos_salidas(SEMISENIOR)
     # ver_tiempos_salidas(SENIOR)
 
-    # # APROXIMACIONES
 
+    # APROXIMACIONES
     coeficientes = {}
     coeficientes["llegadas"] = generar_funcion_aproximada_llegadas()
 
-    coeficientes["salidas_junior"], coeficientes["maximo_x_junior"], coeficientes["maximo_y_junior"] = generar_funcion_aproximada_salidas(JUNIOR)
-    coeficientes["salidas_semisenior"], coeficientes["maximo_x_semisenior"], coeficientes["maximo_y_semisenior"] = generar_funcion_aproximada_salidas(SEMISENIOR)
-    coeficientes["salidas_senior"], coeficientes["maximo_x_senior"], coeficientes["maximo_y_senior"] = generar_funcion_aproximada_salidas(SENIOR)
+    coeficientes["salidas_junior"] = generar_funcion_aproximada_salidas(JUNIOR)
+    coeficientes["salidas_semisenior"] = generar_funcion_aproximada_salidas(SEMISENIOR)
+    coeficientes["salidas_senior"] = generar_funcion_aproximada_salidas(SENIOR)
 
     # GUARDADO
     archivo_salida = open(RUTA_CONFIG_SALIDA,"w+")

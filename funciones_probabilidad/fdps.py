@@ -16,71 +16,55 @@ coeficientes = json.load(open(RUTA_CONFIG_SALIDA))
 #################################
 
 # TPLL
-lista_parametros = coeficientes["llegadas"]
-a = lista_parametros[0]
-b = lista_parametros[1]
-
-def funcion_exponencial(x):
+def fdp_tiempo_llegada(x):
+    a = coeficientes["llegadas"][0]
+    b = coeficientes["llegadas"][1]
     return a*x + b
 
-fdp_tiempo_llegada = funcion_exponencial
 
 # TPSjunior
-fdp_tiempo_salida_junior = np.poly1d(coeficientes["salidas_junior"])
+def fdp_tiempo_salidas_junior(x):
+    a = coeficientes["salidas_junior"][0]
+    b = coeficientes["salidas_junior"][1]
+    return a**x - b
+
 
 # TPSsemisenior
-fdp_tiempo_salida_semisenior = np.poly1d(coeficientes["salidas_semisenior"])
+def fdp_tiempo_salida_semisenior(x):
+    a = coeficientes["salidas_semisenior"][0]
+    b = coeficientes["salidas_semisenior"][1]
+    return a**x - b
 
 # TPSsenior
-fdp_tiempo_salida_senior = np.poly1d(coeficientes["salidas_senior"])
+def fdp_tiempo_salida_senior(x):
+    a = coeficientes["salidas_senior"][0]
+    b = coeficientes["salidas_senior"][1]
+    return a**x - b
 
 #################################
 # FUNCIONES
 #################################
 
-
-def metodo_del_rechazo(a: int, b: int, h: int, funcion) -> int:
-
-    while True:
-        x = ((b - a) * random.random()) + a
-        y = h * random.random()
-
-        if y <= funcion(x):
-            return int(x)
-
-
 def obtener_intervalo_arribo(tipo_tarea: str = "") -> int:
-    return int(fdp_tiempo_llegada(random.random()))
+
+    fdp = 0
+    fdp = fdp if fdp > 0 else fdp_tiempo_llegada(random.random())
+
+    return int(fdp)
 
 
-def obtener_tiempo_resolucion(perfil: str, tipo_tarea: str) -> int:
+def obtener_tiempo_resolucion(perfil: str, tipo_tarea: str = "") -> int:
+
+    rnd = random.random()
+
     if perfil == "junior":
-        return obtener_tiempo_resolucion_junior()
+        fdp = fdp_tiempo_salidas_junior(rnd)
     elif perfil == "semisenior":
-        return obtener_tiempo_resolucion_semisenior()
+        fdp = fdp_tiempo_salida_semisenior(rnd)
     elif perfil == "senior":
-        return obtener_tiempo_resolucion_senior()
+        fdp = fdp_tiempo_salida_senior(rnd)
 
-
-def obtener_tiempo_resolucion_junior() -> int:
-    return metodo_del_rechazo(a=0,
-                              b=coeficientes["maximo_x_junior"],
-                              h=coeficientes["maximo_y_junior"],
-                              funcion=fdp_tiempo_salida_junior)
-
-
-def obtener_tiempo_resolucion_semisenior() -> int:
-    return metodo_del_rechazo(a=0,
-                              b=coeficientes["maximo_x_semisenior"],
-                              h=coeficientes["maximo_y_semisenior"],
-                              funcion=fdp_tiempo_salida_semisenior)
-
-
-def obtener_tiempo_resolucion_senior() -> int:
-    return metodo_del_rechazo(a=0,
-                              b=coeficientes["maximo_x_senior"],
-                              h=coeficientes["maximo_y_senior"],
-                              funcion=fdp_tiempo_salida_senior)
+    return int(fdp)
 
 
 if __name__ == "__main__":
@@ -91,11 +75,11 @@ if __name__ == "__main__":
         f"LLEGADAS \n{[obtener_intervalo_arribo() for i in range(cantidad_puntos)]} \n"
     )
     print(
-        f"SALIDAS JUNIOR \n {[obtener_tiempo_resolucion_junior() for i in range(cantidad_puntos)]} \n\n"
+        f"SALIDAS JUNIOR \n {[obtener_tiempo_resolucion(perfil='junior') for i in range(cantidad_puntos)]} \n\n"
     )
     print(
-        f"SALIDAS SEMISENIOR \n {[obtener_tiempo_resolucion_semisenior() for i in range(cantidad_puntos)]} \n\n"
+        f"SALIDAS SEMISENIOR \n {[obtener_tiempo_resolucion(perfil='semisenior') for i in range(cantidad_puntos)]} \n\n"
     )
     print(
-        f"SALIDAS SENIOR \n {[obtener_tiempo_resolucion_senior() for i in range(cantidad_puntos)]} \n\n"
+        f"SALIDAS SENIOR \n {[obtener_tiempo_resolucion(perfil='senior') for i in range(cantidad_puntos)]} \n\n"
     )
